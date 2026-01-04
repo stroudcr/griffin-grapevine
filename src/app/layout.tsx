@@ -44,7 +44,7 @@ export const metadata: Metadata = {
       "Your trusted source for Spalding County GA news. Local news, events, and community updates from Griffin, Orchard Hill, and Sunny Side.",
     images: [
       {
-        url: `${SITE_CONFIG.url}/OG-image.png`,
+        url: `${SITE_CONFIG.url}/griffin-og-image.png`,
         width: 1200,
         height: 630,
         alt: "Griffin Grapevine - Local News with Character for Spalding County, GA",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     title: "Griffin Grapevine | Spalding County GA News",
     description:
       "Your trusted source for Spalding County GA news. Local news from Griffin, Orchard Hill, Sunny Side & more.",
-    images: [`${SITE_CONFIG.url}/OG-image.png`],
+    images: [`${SITE_CONFIG.url}/griffin-og-image.png`],
   },
   metadataBase: new URL(SITE_CONFIG.url),
   alternates: {
@@ -64,8 +64,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/Favicon.jpg", type: "image/jpeg" },
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon-512x512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: "/apple-touch-icon.png",
   },
