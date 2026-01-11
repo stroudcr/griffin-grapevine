@@ -24,12 +24,12 @@ export const SITE_CONFIG = {
 
   // Social media profiles (placeholder - update when accounts are created)
   social: {
-    facebook: "https://www.facebook.com/griffingrapevine",
+    facebook: "https://www.facebook.com/profile.php?id=61586121189986",
     instagram: "https://www.instagram.com/griffingrapevine",
   },
 
   // Default images
-  defaultOgImage: "https://www.griffingrapevine.com/OG-image.png",
+  defaultOgImage: "https://www.griffingrapevine.com/griffin-og-image.png",
   logo: "https://www.griffingrapevine.com/horizontal.jpg",
   logoWidth: 1215,
   logoHeight: 238,
