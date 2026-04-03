@@ -50,10 +50,10 @@ export default async function HomePage() {
             {/* Hero image banner */}
             <div className="relative w-screen left-1/2 right-1/2 -mx-[50vw] mb-8">
               <Image
-                src="/deer.jpg"
-                alt="Spalding County, Georgia"
-                width={5184}
-                height={3456}
+                src="/DowntownGriffin.webp"
+                alt="Aerial view of downtown Griffin, Georgia"
+                width={1920}
+                height={775}
                 quality={85}
                 sizes="100vw"
                 priority
