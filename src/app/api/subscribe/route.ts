@@ -4,10 +4,21 @@ import { createSubscription } from "@/lib/beehiiv/client";
 // Simple email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function optionalString(value: unknown) {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, utm_source, utm_medium, utm_campaign } = body;
+    const {
+      email,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+    } = body;
 
     // Validate email
     if (!email || typeof email !== "string") {
@@ -29,9 +40,11 @@ export async function POST(request: NextRequest) {
       email: email.toLowerCase().trim(),
       reactivate_existing: true,
       send_welcome_email: true,
-      utm_source: utm_source || "website",
-      utm_medium: utm_medium || "subscribe_form",
-      utm_campaign: utm_campaign || undefined,
+      utm_source: optionalString(utm_source) || "website",
+      utm_medium: optionalString(utm_medium) || "subscribe_form",
+      utm_campaign: optionalString(utm_campaign),
+      utm_content: optionalString(utm_content),
+      utm_term: optionalString(utm_term),
       referring_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.griffingrapevine.com",
     });
 

@@ -49,6 +49,8 @@ export interface BeehiivSubscriptionCreate {
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
   referring_site?: string;
   custom_fields?: Record<string, string>;
 }

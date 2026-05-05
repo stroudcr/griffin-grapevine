@@ -7,6 +7,56 @@ interface SubscribeFormProps {
   className?: string;
 }
 
+declare global {
+  interface Window {
+    fbq?: (
+      method: "track",
+      eventName: "Lead",
+      parameters?: Record<string, string>
+    ) => void;
+  }
+}
+
+const UTM_PARAMS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+] as const;
+
+function getAttributionParams(variant: SubscribeFormProps["variant"]) {
+  const attribution: Record<string, string> = {};
+
+  if (typeof window !== "undefined") {
+    const searchParams = new URLSearchParams(window.location.search);
+
+    for (const param of UTM_PARAMS) {
+      const value = searchParams.get(param);
+
+      if (value) {
+        attribution[param] = value;
+      }
+    }
+  }
+
+  return {
+    utm_source: "website",
+    utm_medium: variant || "subscribe_form",
+    ...attribution,
+  };
+}
+
+function trackMetaLead() {
+  if (typeof window === "undefined" || typeof window.fbq !== "function") {
+    return;
+  }
+
+  window.fbq("track", "Lead", {
+    content_name: "griffin_grapevine_newsletter",
+  });
+}
+
 export function SubscribeForm({ variant = "inline", className = "" }: SubscribeFormProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -29,8 +79,7 @@ export function SubscribeForm({ variant = "inline", className = "" }: SubscribeF
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          utm_source: "website",
-          utm_medium: variant,
+          ...getAttributionParams(variant),
         }),
       });
 
@@ -42,6 +91,7 @@ export function SubscribeForm({ variant = "inline", className = "" }: SubscribeF
 
       setStatus("success");
       setMessage("Welcome to the Griffin Grapevine!");
+      trackMetaLead();
       setEmail("");
     } catch (error) {
       setStatus("error");
