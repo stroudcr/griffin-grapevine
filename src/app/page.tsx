@@ -49,21 +49,23 @@ export default async function HomePage() {
             <h1 className="font-serif font-bold text-4xl sm:text-5xl lg:text-6xl text-navy mb-8">
               Spalding County News <br/> with Character
             </h1>
+          </div>
 
-            {/* Hero image banner */}
-            <div className="relative w-screen left-1/2 right-1/2 -mx-[50vw] mb-8">
-              <Image
-                src="/DowntownGriffin.webp"
-                alt="Aerial view of downtown Griffin, Georgia"
-                width={1920}
-                height={775}
-                quality={85}
-                sizes="100vw"
-                priority
-                className="w-full h-64 sm:h-80 lg:h-96 object-cover"
-              />
-            </div>
+          {/* Hero image banner */}
+          <div className="mb-8">
+            <Image
+              src="/DowntownGriffin.webp"
+              alt="Aerial view of downtown Griffin, Georgia"
+              width={1920}
+              height={775}
+              quality={85}
+              sizes="100vw"
+              priority
+              className="w-full h-64 sm:h-80 lg:h-96 object-cover"
+            />
+          </div>
 
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p className="text-slate text-lg sm:text-xl max-w-2xl mx-auto mb-8">
               Stay connected with your community. Local news, events, and stories
               that matter to Spalding County residents. Delivered free to your inbox every week.
