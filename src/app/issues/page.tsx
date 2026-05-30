@@ -105,7 +105,7 @@ export default async function IssuesPage({ searchParams }: IssuesPageProps) {
                 <div className="flex flex-wrap gap-2">
                   <Link
                     href={filterHref({ city: selectedCity?.slug })}
-                    className={`rounded-full px-3 py-1.5 text-sm font-medium ${!selectedTopic ? "bg-navy text-white" : "bg-white text-navy border border-gray-200"}`}
+                    className={`rounded-full px-3 py-1.5 text-sm font-medium ${!selectedTopic ? "bg-navy !text-white" : "bg-white text-navy border border-gray-200"}`}
                   >
                     All topics
                   </Link>
@@ -113,7 +113,7 @@ export default async function IssuesPage({ searchParams }: IssuesPageProps) {
                     <Link
                       key={topic.slug}
                       href={filterHref({ topic: topic.slug, city: selectedCity?.slug })}
-                      className={`rounded-full px-3 py-1.5 text-sm font-medium ${selectedTopic?.slug === topic.slug ? "bg-navy text-white" : "bg-white text-navy border border-gray-200"}`}
+                      className={`rounded-full px-3 py-1.5 text-sm font-medium ${selectedTopic?.slug === topic.slug ? "bg-navy !text-white" : "bg-white text-navy border border-gray-200"}`}
                     >
                       {topic.label}
                     </Link>
@@ -128,7 +128,7 @@ export default async function IssuesPage({ searchParams }: IssuesPageProps) {
                 <div className="flex flex-wrap gap-2">
                   <Link
                     href={filterHref({ topic: selectedTopic?.slug })}
-                    className={`rounded-full px-3 py-1.5 text-sm font-medium ${!selectedCity ? "bg-navy text-white" : "bg-white text-navy border border-gray-200"}`}
+                    className={`rounded-full px-3 py-1.5 text-sm font-medium ${!selectedCity ? "bg-navy !text-white" : "bg-white text-navy border border-gray-200"}`}
                   >
                     All Spalding County
                   </Link>
@@ -136,7 +136,7 @@ export default async function IssuesPage({ searchParams }: IssuesPageProps) {
                     <Link
                       key={city.slug}
                       href={filterHref({ topic: selectedTopic?.slug, city: city.slug })}
-                      className={`rounded-full px-3 py-1.5 text-sm font-medium ${selectedCity?.slug === city.slug ? "bg-navy text-white" : "bg-white text-navy border border-gray-200"}`}
+                      className={`rounded-full px-3 py-1.5 text-sm font-medium ${selectedCity?.slug === city.slug ? "bg-navy !text-white" : "bg-white text-navy border border-gray-200"}`}
                     >
                       {city.label}
                     </Link>
