@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Header, Footer, SubscribeForm, JsonLd, IssueCard } from "@/components";
-import { getAllIssues, transformPost } from "@/lib/beehiiv/posts";
+import { transformPost } from "@/lib/beehiiv/posts";
 import { getAllPosts, getPostById } from "@/lib/beehiiv/client";
 import { generateNewsArticleSchema, generateBreadcrumbSchema } from "@/lib/seo/schemas";
 import { SITE_CONFIG } from "@/lib/seo/constants";
@@ -31,8 +31,18 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
 
-  // Get post from cached list - no need to fetch full content for metadata
-  const allPosts = await getAllPosts();
+  // Get post from the lightweight cached list - no need to fetch full content for metadata
+  let allPosts: Awaited<ReturnType<typeof getAllPosts>> = [];
+  try {
+    allPosts = await getAllPosts({ expand: [] });
+  } catch {
+    return {
+      title: "Issue",
+      alternates: {
+        canonical: `${SITE_CONFIG.url}/issues/${slug}`,
+      },
+    };
+  }
   const post = allPosts.find((p) => p.slug === slug);
 
   if (!post) {
@@ -82,9 +92,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   try {
-    const issues = await getAllIssues();
-    return issues.map((issue) => ({
-      slug: issue.slug,
+    const posts = await getAllPosts({ expand: [] });
+    return posts.map((post) => ({
+      slug: post.slug,
     }));
   } catch {
     return [];
@@ -94,16 +104,24 @@ export async function generateStaticParams() {
 export default async function IssuePage({ params }: Props) {
   const { slug } = await params;
 
-  // First, get the post ID from all posts (cached with 5min revalidation)
-  const allPosts = await getAllPosts();
+  // First, get the post ID from the lightweight cached list.
+  const allPosts = await getAllPosts({ expand: [] });
   const post = allPosts.find((p) => p.slug === slug);
 
   if (!post) {
     notFound();
   }
 
-  // Fetch the full post content by ID (fast, direct API call)
-  const fullPost = await getPostById(post.id);
+  // Fetch the full post content by ID. If Beehiiv has a transient issue during
+  // prerendering, keep the article page buildable from the list metadata.
+  let fullPost = post;
+  try {
+    fullPost = await getPostById(post.id);
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(`Failed to fetch Beehiiv post content for ${slug}:`, error);
+    }
+  }
 
   const issue = transformPost(fullPost);
   const allIssues = allPosts.map(transformPost);

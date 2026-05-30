@@ -8,6 +8,10 @@ import type {
 
 const BEEHIIV_API_URL = "https://api.beehiiv.com/v2";
 
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function getApiKey(): string {
   const apiKey = process.env.BEEHIIV_API_KEY;
   if (!apiKey) {
@@ -30,27 +34,49 @@ async function beehiivFetch<T>(
 ): Promise<T> {
   const apiKey = getApiKey();
   const publicationId = getPublicationId();
-
   const url = `${BEEHIIV_API_URL}/publications/${publicationId}${endpoint}`;
+  const method = options.method || "GET";
+  const canRetry = method === "GET" || method === "HEAD";
+  const maxAttempts = canRetry ? 3 : 1;
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    let response: Response;
 
-  if (!response.ok) {
+    try {
+      response = await fetch(url, {
+        ...options,
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
+      });
+    } catch (error) {
+      if (canRetry && attempt < maxAttempts) {
+        await wait(attempt * 500);
+        continue;
+      }
+      throw error;
+    }
+
+    if (response.ok) {
+      return response.json();
+    }
+
     const errorText = await response.text();
+    const retryableStatus = [408, 429, 500, 502, 503, 504].includes(response.status);
+    if (canRetry && retryableStatus && attempt < maxAttempts) {
+      await wait(attempt * 500);
+      continue;
+    }
+
     if (process.env.NODE_ENV === "development") {
       console.error(`Beehiiv API error: ${response.status} - ${errorText}`);
     }
     throw new Error(`Beehiiv API error: ${response.status}`);
   }
 
-  return response.json();
+  throw new Error("Beehiiv API request failed");
 }
 
 export async function getPosts(
@@ -108,13 +134,17 @@ export async function getPostById(id: string): Promise<BeehiivPost> {
   ).then((res) => res.data);
 }
 
-export async function getAllPosts(): Promise<BeehiivPost[]> {
+export async function getAllPosts(
+  options: {
+    expand?: string[];
+  } = {}
+): Promise<BeehiivPost[]> {
   const allPosts: BeehiivPost[] = [];
   let page = 1;
   let hasMore = true;
 
   while (hasMore) {
-    const response = await getPosts({ page, limit: 50 });
+    const response = await getPosts({ page, limit: 50, expand: options.expand });
     allPosts.push(...response.data);
     hasMore = page < response.total_pages;
     page++;

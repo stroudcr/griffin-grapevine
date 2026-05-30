@@ -45,12 +45,12 @@ export function transformPost(post: BeehiivPost): Issue {
 }
 
 export async function getLatestIssues(count: number = 6): Promise<Issue[]> {
-  const response = await getPosts({ limit: count });
+  const response = await getPosts({ limit: count, expand: [] });
   return response.data.map(transformPost);
 }
 
 export async function getAllIssues(): Promise<Issue[]> {
-  const posts = await getAllPosts();
+  const posts = await getAllPosts({ expand: [] });
   return posts.map(transformPost);
 }
 
