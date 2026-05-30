@@ -1,5 +1,11 @@
 import { SITE_CONFIG } from "./constants";
 import type { Issue } from "@/lib/beehiiv/types";
+import {
+  getIssueDisplayTitle,
+  getIssueSeoDescription,
+  getIssueTags,
+  stripHtml,
+} from "./issues";
 
 // Organization schema for the root layout (NewsMediaOrganization)
 export function generateOrganizationSchema() {
@@ -69,16 +75,23 @@ export function generateWebsiteSchema() {
 // NewsArticle schema for issue pages
 export function generateNewsArticleSchema(issue: Issue, slug: string) {
   const articleUrl = `${SITE_CONFIG.url}/issues/${slug}`;
+  const headline = getIssueDisplayTitle(issue);
+  const description = getIssueSeoDescription(issue);
+  const articleTags = getIssueTags(issue).map((tag) => tag.label);
+  const articleText = stripHtml(issue.content);
 
   return {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
+    "@id": `${articleUrl}#article`,
+    url: articleUrl,
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": articleUrl,
     },
-    headline: issue.title,
-    description: issue.excerpt || `Read ${issue.title} from the Griffin Grapevine.`,
+    headline,
+    ...(headline !== issue.title ? { alternativeHeadline: issue.title } : {}),
+    description,
     image: issue.thumbnailUrl || SITE_CONFIG.defaultOgImage,
     datePublished: issue.publishDate.toISOString(),
     dateModified: issue.publishDate.toISOString(),
@@ -106,7 +119,9 @@ export function generateNewsArticleSchema(issue: Issue, slug: string) {
     },
     isAccessibleForFree: true,
     inLanguage: "en-US",
-    copyrightYear: new Date().getFullYear(),
+    articleSection: articleTags,
+    ...(articleText ? { wordCount: articleText.split(/\s+/).length } : {}),
+    copyrightYear: issue.publishDate.getFullYear(),
     copyrightHolder: {
       "@type": "Organization",
       name: SITE_CONFIG.name,
@@ -122,6 +137,7 @@ export function generateNewsArticleSchema(issue: Issue, slug: string) {
       "Sunny Side",
       "local news",
       "Georgia",
+      ...articleTags,
     ],
   };
 }
@@ -138,6 +154,30 @@ export function generateBreadcrumbSchema(
       position: index + 1,
       name: item.name,
       item: item.url,
+    })),
+  };
+}
+
+export function generateItemListSchema(
+  items: { name: string; url: string; datePublished?: Date }[],
+  name = "Griffin Grapevine local news archive"
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: item.url,
+      item: {
+        "@type": "NewsArticle",
+        headline: item.name,
+        url: item.url,
+        ...(item.datePublished
+          ? { datePublished: item.datePublished.toISOString() }
+          : {}),
+      },
     })),
   };
 }

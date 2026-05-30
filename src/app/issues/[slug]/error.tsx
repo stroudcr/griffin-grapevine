@@ -27,7 +27,7 @@ export default function Error({
             Failed to load this issue
           </h1>
           <p className="text-slate mb-8">
-            We couldn't load this newsletter issue. It might not exist or there
+            We couldn&apos;t load this newsletter issue. It might not exist or there
             could be a temporary problem.
           </p>
           <div className="flex gap-4 justify-center">

@@ -25,8 +25,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Griffin Grapevine | Spalding County GA News & Community Updates",
-    template: "%s | Griffin Grapevine - Spalding County News",
+    default: "Griffin Grapevine | Spalding County GA News",
+    template: "%s | Griffin Grapevine",
   },
   description:
     "Your trusted source for Spalding County GA news. Local news, events, and community updates from Griffin, Orchard Hill, and Sunny Side. Free weekly newsletter.",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_CONFIG.url,
     siteName: SITE_CONFIG.name,
-    title: "Griffin Grapevine | Spalding County GA News & Community Updates",
+    title: "Griffin Grapevine | Spalding County GA News",
     description:
       "Your trusted source for Spalding County GA news. Local news, events, and community updates from Griffin, Orchard Hill, and Sunny Side.",
     images: [

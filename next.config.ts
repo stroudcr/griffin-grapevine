@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   compress: true,
+  turbopack: {
+    root: process.cwd(),
+  },
 
   images: {
     remotePatterns: [
@@ -20,6 +23,7 @@ const nextConfig: NextConfig = {
       },
     ],
     formats: ["image/webp", "image/avif"],
+    qualities: [75, 80, 85],
   },
 };
 

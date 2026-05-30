@@ -75,6 +75,35 @@ a:not(footer a):hover {
   font-style: italic;
 }
 
+.newsletter-content {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  color: var(--slate);
+  background: var(--white);
+}
+
+.newsletter-content h1 {
+  display: none;
+}
+
+.newsletter-content h2,
+.newsletter-content h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.newsletter-content p,
+.newsletter-content li {
+  line-height: 1.75;
+}
+
+.newsletter-content a {
+  color: var(--navy);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Button styles */
 .btn-primary {
   background-color: var(--navy);

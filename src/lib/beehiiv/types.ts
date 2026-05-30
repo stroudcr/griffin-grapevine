@@ -81,6 +81,9 @@ export interface Issue {
   thumbnailUrl?: string;
   excerpt?: string;
   content?: string;
+  webUrl?: string;
+  metaTitle?: string;
+  metaDescription?: string;
   authors?: {
     name?: string;
     avatar?: string;

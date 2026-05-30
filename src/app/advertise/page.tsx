@@ -4,7 +4,7 @@ import { Header, Footer } from "@/components";
 import { SITE_CONFIG } from "@/lib/seo/constants";
 
 export const metadata: Metadata = {
-  title: "Advertise | Reach Spalding County Residents",
+  title: "Advertise in Spalding County",
   description:
     "Advertise to engaged Spalding County residents. Sponsorship opportunities in our Griffin, Orchard Hill, and Sunny Side newsletter reaching local readers weekly.",
   alternates: {

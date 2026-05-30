@@ -8,11 +8,17 @@ export function transformPost(post: BeehiivPost): Issue {
     ? new Date(post.publish_date * 1000)
     : new Date();
 
-  // Extract excerpt from content or use subtitle
-  let excerpt = post.subtitle || "";
-  if (!excerpt && post.content?.free?.email) {
+  const preferredContent =
+    post.content?.free?.web ||
+    post.content?.free?.email ||
+    post.content?.free?.rss ||
+    "";
+
+  // Extract excerpt from metadata, subtitle, or content.
+  let excerpt = post.meta_default_description || post.subtitle || "";
+  if (!excerpt && preferredContent) {
     // Strip HTML and take first 200 chars
-    const textContent = post.content.free.email
+    const textContent = preferredContent
       .replace(/<[^>]+>/g, " ")
       .replace(/\s+/g, " ")
       .trim();
@@ -27,7 +33,10 @@ export function transformPost(post: BeehiivPost): Issue {
     publishDate,
     thumbnailUrl: post.thumbnail_url,
     excerpt,
-    content: post.content?.free?.email,
+    content: preferredContent,
+    webUrl: post.web_url,
+    metaTitle: post.meta_default_title,
+    metaDescription: post.meta_default_description,
     authors: post.authors?.map((a) => ({
       name: a.name,
       avatar: a.profile_picture,

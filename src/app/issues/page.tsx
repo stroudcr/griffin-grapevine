@@ -1,11 +1,22 @@
 import { Metadata } from "next";
-import { Header, Footer, IssueCard, SubscribeForm } from "@/components";
+import Link from "next/link";
+import { Header, Footer, IssueCard, SubscribeForm, JsonLd } from "@/components";
 import { getAllIssues } from "@/lib/beehiiv/posts";
 import type { Issue } from "@/lib/beehiiv/types";
 import { SITE_CONFIG } from "@/lib/seo/constants";
+import {
+  ISSUE_CITIES,
+  ISSUE_TOPICS,
+  cleanIssueTitle,
+  findCityBySlug,
+  findTopicBySlug,
+  issueMatchesCity,
+  issueMatchesTopic,
+} from "@/lib/seo/issues";
+import { generateItemListSchema } from "@/lib/seo/schemas";
 
 export const metadata: Metadata = {
-  title: "News Archive | Spalding County GA Local News Issues",
+  title: "Spalding County News Archive",
   description:
     "Browse all Spalding County news issues. Read past coverage of Griffin, Orchard Hill, Sunny Side local news, events, and community stories.",
   alternates: {
@@ -13,7 +24,32 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function IssuesPage() {
+interface IssuesPageProps {
+  searchParams: Promise<{
+    topic?: string;
+    city?: string;
+  }>;
+}
+
+function filterHref(params: { topic?: string; city?: string }) {
+  const query = new URLSearchParams();
+
+  if (params.topic) {
+    query.set("topic", params.topic);
+  }
+
+  if (params.city) {
+    query.set("city", params.city);
+  }
+
+  const queryString = query.toString();
+  return queryString ? `/issues?${queryString}` : "/issues";
+}
+
+export default async function IssuesPage({ searchParams }: IssuesPageProps) {
+  const { topic: topicSlug, city: citySlug } = await searchParams;
+  const selectedTopic = findTopicBySlug(topicSlug);
+  const selectedCity = findCityBySlug(citySlug);
   let issues: Issue[] = [];
 
   try {
@@ -24,8 +60,24 @@ export default async function IssuesPage() {
     }
   }
 
+  const filteredIssues = issues.filter((issue) =>
+    issueMatchesTopic(issue, selectedTopic?.slug) &&
+    issueMatchesCity(issue, selectedCity?.slug)
+  );
+  const itemListSchema = generateItemListSchema(
+    filteredIssues.map((issue) => ({
+      name: cleanIssueTitle(issue.title),
+      url: `${SITE_CONFIG.url}/issues/${issue.slug}`,
+      datePublished: issue.publishDate,
+    })),
+    selectedTopic || selectedCity
+      ? `${selectedTopic?.label || selectedCity?.label} news from Griffin Grapevine`
+      : "Spalding County news archive from Griffin Grapevine"
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
+      <JsonLd data={itemListSchema} />
       <Header />
 
       <main className="flex-1 bg-paper">
@@ -33,7 +85,7 @@ export default async function IssuesPage() {
         <section className="bg-white border-b border-gray-200 py-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="font-serif font-bold text-3xl sm:text-4xl text-navy mb-4">
-              Archive
+              Spalding County News Archive
             </h1>
             <p className="text-slate text-lg max-w-2xl">
               Browse all past issues of the Griffin Grapevine. Catch up on local news,
@@ -45,9 +97,57 @@ export default async function IssuesPage() {
         {/* Issues Grid */}
         <section className="py-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            {issues.length > 0 ? (
+            <div className="mb-8 space-y-5">
+              <div>
+                <h2 className="font-serif font-bold text-xl text-navy mb-3">
+                  Browse by topic
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href={filterHref({ city: selectedCity?.slug })}
+                    className={`rounded-full px-3 py-1.5 text-sm font-medium ${!selectedTopic ? "bg-navy text-white" : "bg-white text-navy border border-gray-200"}`}
+                  >
+                    All topics
+                  </Link>
+                  {ISSUE_TOPICS.map((topic) => (
+                    <Link
+                      key={topic.slug}
+                      href={filterHref({ topic: topic.slug, city: selectedCity?.slug })}
+                      className={`rounded-full px-3 py-1.5 text-sm font-medium ${selectedTopic?.slug === topic.slug ? "bg-navy text-white" : "bg-white text-navy border border-gray-200"}`}
+                    >
+                      {topic.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h2 className="font-serif font-bold text-xl text-navy mb-3">
+                  Browse by city
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href={filterHref({ topic: selectedTopic?.slug })}
+                    className={`rounded-full px-3 py-1.5 text-sm font-medium ${!selectedCity ? "bg-navy text-white" : "bg-white text-navy border border-gray-200"}`}
+                  >
+                    All Spalding County
+                  </Link>
+                  {ISSUE_CITIES.map((city) => (
+                    <Link
+                      key={city.slug}
+                      href={filterHref({ topic: selectedTopic?.slug, city: city.slug })}
+                      className={`rounded-full px-3 py-1.5 text-sm font-medium ${selectedCity?.slug === city.slug ? "bg-navy text-white" : "bg-white text-navy border border-gray-200"}`}
+                    >
+                      {city.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {filteredIssues.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {issues.map((issue) => (
+                {filteredIssues.map((issue) => (
                   <IssueCard key={issue.id} issue={issue} />
                 ))}
               </div>
@@ -69,10 +169,10 @@ export default async function IssuesPage() {
                   </svg>
                 </div>
                 <h2 className="font-serif font-bold text-xl text-navy mb-2">
-                  No issues yet
+                  No matching issues
                 </h2>
                 <p className="text-slate mb-6">
-                  Subscribe to be the first to know when we publish.
+                  Try another topic or city, or subscribe to get new local coverage.
                 </p>
                 <SubscribeForm variant="inline" className="max-w-md mx-auto" />
               </div>

@@ -3,7 +3,7 @@ import { Header, Footer } from "@/components";
 import { SITE_CONFIG } from "@/lib/seo/constants";
 
 export const metadata: Metadata = {
-  title: "Contact | Spalding County News Tips & Inquiries",
+  title: "Contact Griffin Grapevine",
   description:
     "Contact the Griffin Grapevine with news tips, feedback, or advertising inquiries. We cover Spalding County GA including Griffin, Orchard Hill, and Sunny Side.",
   alternates: {

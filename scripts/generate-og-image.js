@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const sharp = require('sharp');
 const path = require('path');
 
@@ -6,9 +7,6 @@ async function generateOGImage() {
   const outputPath = path.join(__dirname, '../public/og-default.jpg');
 
   try {
-    // Read the logo to get its dimensions
-    const logoMetadata = await sharp(logoPath).metadata();
-
     // OG image dimensions
     const ogWidth = 1200;
     const ogHeight = 630;
@@ -18,8 +16,6 @@ async function generateOGImage() {
 
     // Calculate logo dimensions (make it 70% of the width, centered)
     const maxLogoWidth = Math.floor(ogWidth * 0.7);
-    const logoScale = maxLogoWidth / logoMetadata.width;
-    const scaledLogoHeight = Math.floor(logoMetadata.height * logoScale);
 
     // Create the OG image
     await sharp({

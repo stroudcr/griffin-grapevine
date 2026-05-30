@@ -1,11 +1,19 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Header, Footer, SubscribeForm, JsonLd } from "@/components";
-import { getAdjacentIssues, getAllIssues, transformPost } from "@/lib/beehiiv/posts";
+import { Header, Footer, SubscribeForm, JsonLd, IssueCard } from "@/components";
+import { getAllIssues, transformPost } from "@/lib/beehiiv/posts";
 import { getAllPosts, getPostById } from "@/lib/beehiiv/client";
 import { generateNewsArticleSchema, generateBreadcrumbSchema } from "@/lib/seo/schemas";
 import { SITE_CONFIG } from "@/lib/seo/constants";
+import {
+  getIssueDisplayTitle,
+  getIssueSeoDescription,
+  getIssueSeoTitle,
+  getIssueStoryDeck,
+  getIssueTags,
+  getRelatedIssues,
+} from "@/lib/seo/issues";
 import { sanitizeBeehiivContent } from "@/lib/sanitization";
 
 // Route Segment Config
@@ -36,18 +44,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Transform to Issue format for metadata
   const issue = transformPost(post);
 
-  const description = issue.excerpt
-    ? `${issue.excerpt.slice(0, 150)}... | Spalding County local news from Griffin, Orchard Hill, Sunny Side & more.`
-    : `Read ${issue.title} - Spalding County GA local news and community updates.`;
+  const description = getIssueSeoDescription(issue);
 
   const articleUrl = `${SITE_CONFIG.url}/issues/${slug}`;
+  const seoTitle = getIssueSeoTitle(issue);
+  const displayTitle = getIssueDisplayTitle(issue);
 
   return {
-    title: issue.title,
+    title: {
+      absolute: seoTitle,
+    },
     description,
     authors: issue.authors?.map((a) => ({ name: a.name })) || [{ name: "Griffin Grapevine" }],
     openGraph: {
-      title: `${issue.title} | Griffin Grapevine`,
+      title: seoTitle,
       description,
       type: "article",
       publishedTime: issue.publishDate.toISOString(),
@@ -56,13 +66,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       tags: ["Spalding County", "Georgia", "local news", "Griffin", "Orchard Hill", "Sunny Side"],
       images: issue.thumbnailUrl
         ? [{ url: issue.thumbnailUrl, width: 1200, height: 630 }]
-        : [{ url: `${SITE_CONFIG.url}/og-default.svg`, width: 1200, height: 630 }],
+        : [{ url: SITE_CONFIG.defaultOgImage, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
-      title: issue.title,
+      title: displayTitle,
       description,
-      images: [issue.thumbnailUrl || `${SITE_CONFIG.url}/og-default.svg`],
+      images: [issue.thumbnailUrl || SITE_CONFIG.defaultOgImage],
     },
     alternates: {
       canonical: articleUrl,
@@ -93,17 +103,31 @@ export default async function IssuePage({ params }: Props) {
   }
 
   // Fetch the full post content by ID (fast, direct API call)
-  const [fullPost, adjacent] = await Promise.all([
-    getPostById(post.id),
-    getAdjacentIssues(slug),
-  ]);
+  const fullPost = await getPostById(post.id);
 
   const issue = transformPost(fullPost);
+  const allIssues = allPosts.map(transformPost);
+  const currentIndex = allIssues.findIndex((item) => item.slug === slug);
+  const adjacent = {
+    // Previous = newer (lower index since sorted desc by date)
+    prev: currentIndex > 0 ? allIssues[currentIndex - 1] : null,
+    // Next = older (higher index)
+    next: currentIndex >= 0 && currentIndex < allIssues.length - 1
+      ? allIssues[currentIndex + 1]
+      : null,
+  };
+  const relatedIssues = getRelatedIssues(issue, allIssues);
+  const displayTitle = getIssueDisplayTitle(issue);
+  const storyDeck = getIssueStoryDeck(issue);
+  const issueTags = getIssueTags(issue);
 
   // Sanitize HTML content from Beehiiv API to prevent XSS attacks
   // Defense-in-depth: Even though Beehiiv strips scripts, we apply our own sanitization
   const sanitizedContent = issue.content
-    ? sanitizeBeehiivContent(issue.content)
+    ? sanitizeBeehiivContent(issue.content, {
+        defaultImageAlt: displayTitle,
+        stripFirstHeading: true,
+      })
     : "";
 
   // Generate structured data schemas
@@ -111,7 +135,7 @@ export default async function IssuePage({ params }: Props) {
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Home", url: SITE_CONFIG.url },
     { name: "Issues", url: `${SITE_CONFIG.url}/issues` },
-    { name: issue.title, url: `${SITE_CONFIG.url}/issues/${slug}` },
+    { name: displayTitle, url: `${SITE_CONFIG.url}/issues/${slug}` },
   ]);
 
   return (
@@ -148,9 +172,47 @@ export default async function IssuePage({ params }: Props) {
         </section>
 
         {/* Issue Content */}
-        <article className="newsletter-content">
+        <article className="bg-white">
+          <header className="border-b border-gray-200 bg-paper py-12">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-wrap items-center gap-3 text-sm text-slate mb-4">
+                <span className="font-medium text-gold">Spalding County Local News</span>
+                <span aria-hidden="true">/</span>
+                <time dateTime={issue.publishDate.toISOString()}>
+                  {issue.publishDate.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+              </div>
+              <h1 className="font-serif font-bold text-3xl sm:text-4xl lg:text-5xl text-navy mb-5">
+                {displayTitle}
+              </h1>
+              {storyDeck && (
+                <p className="text-lg sm:text-xl text-slate leading-relaxed">
+                  {storyDeck}
+                </p>
+              )}
+              {issueTags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-6">
+                  {issueTags.map((tag) => (
+                    <Link
+                      key={`${tag.type}-${tag.slug}`}
+                      href={tag.type === "topic" ? `/issues?topic=${tag.slug}` : `/issues?city=${tag.slug}`}
+                      className="inline-flex rounded-full bg-white px-3 py-1.5 text-sm font-medium text-navy border border-gray-200"
+                    >
+                      {tag.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </header>
+
           {sanitizedContent ? (
             <div
+              className="newsletter-content"
               dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
           ) : (
@@ -161,6 +223,22 @@ export default async function IssuePage({ params }: Props) {
             </div>
           )}
         </article>
+
+        {/* Related local coverage */}
+        {relatedIssues.length > 0 && (
+          <section className="py-12 bg-paper border-t border-gray-200">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 className="font-serif font-bold text-2xl text-navy mb-6">
+                Related local coverage
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {relatedIssues.map((relatedIssue) => (
+                  <IssueCard key={relatedIssue.id} issue={relatedIssue} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Subscribe CTA (after first section) */}
         <section className="py-8 bg-white border-y border-gray-200">

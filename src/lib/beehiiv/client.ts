@@ -65,7 +65,7 @@ export async function getPosts(
     page = 1,
     limit = 10,
     status = "confirmed",
-    expand = ["free_email_content"],
+    expand = ["free_web_content", "free_email_content"],
   } = options;
 
   const params = new URLSearchParams({
@@ -100,9 +100,12 @@ export async function getPostBySlug(
 }
 
 export async function getPostById(id: string): Promise<BeehiivPost> {
-  return beehiivFetch<{ data: BeehiivPost }>(`/posts/${id}?expand[]=free_email_content`, {
-    next: { revalidate: 300 },
-  }).then((res) => res.data);
+  return beehiivFetch<{ data: BeehiivPost }>(
+    `/posts/${id}?expand[]=free_web_content&expand[]=free_email_content`,
+    {
+      next: { revalidate: 300 },
+    }
+  ).then((res) => res.data);
 }
 
 export async function getAllPosts(): Promise<BeehiivPost[]> {

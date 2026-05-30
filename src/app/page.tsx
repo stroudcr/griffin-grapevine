@@ -4,11 +4,14 @@ import { getLatestIssues } from "@/lib/beehiiv/posts";
 import type { Issue } from "@/lib/beehiiv/types";
 import { generateWebsiteSchema } from "@/lib/seo/schemas";
 import { SITE_CONFIG } from "@/lib/seo/constants";
+import { cleanIssueTitle } from "@/lib/seo/issues";
 import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Spalding County News | Local Updates from Griffin, Orchard Hill & Sunny Side",
+  title: {
+    absolute: "Spalding County News | Griffin Grapevine",
+  },
   description:
     "Get free weekly Spalding County GA news delivered to your inbox. Covering Griffin, Orchard Hill, Sunny Side local news, events, and community updates.",
   alternates: {
@@ -22,7 +25,7 @@ export default async function HomePage() {
   let featuredIssue: Issue | null = null;
 
   try {
-    latestIssues = await getLatestIssues(6);
+    latestIssues = await getLatestIssues(12);
     featuredIssue = latestIssues[0] || null;
   } catch (error) {
     // Handle API error gracefully - show empty state
@@ -95,6 +98,51 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* Local SEO landing section */}
+        <section className="py-14 bg-white border-y border-gray-200">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mb-8">
+              <h2 className="font-serif font-bold text-2xl sm:text-3xl text-navy mb-4">
+                Local news for Griffin and Spalding County
+              </h2>
+              <p className="text-slate text-lg">
+                Follow city decisions, county government, weekend events, school news,
+                business openings, weather, and community stories from Griffin,
+                Orchard Hill, Sunny Side, and the rest of Spalding County.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <Link href="/griffin-ga-news" className="card group">
+                <h3 className="font-serif font-bold text-xl text-navy mb-2">
+                  Griffin GA News
+                </h3>
+                <p className="text-sm text-slate">
+                  Local updates from Griffin, Georgia, including city news,
+                  businesses, events, schools, and neighborhood stories.
+                </p>
+              </Link>
+              <Link href="/local-government" className="card group">
+                <h3 className="font-serif font-bold text-xl text-navy mb-2">
+                  Local Government
+                </h3>
+                <p className="text-sm text-slate">
+                  County commission, city council, zoning, elections, public safety,
+                  and civic decisions that affect Spalding County.
+                </p>
+              </Link>
+              <Link href="/spalding-county-events" className="card group">
+                <h3 className="font-serif font-bold text-xl text-navy mb-2">
+                  Spalding County Events
+                </h3>
+                <p className="text-sm text-slate">
+                  Weekend calendars, community gatherings, concerts, ceremonies,
+                  festivals, and local things to do.
+                </p>
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Latest Issue Section */}
         {featuredIssue && (
           <section className="py-16 bg-white">
@@ -123,10 +171,28 @@ export default async function HomePage() {
                 Recent Issues
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {latestIssues.slice(1, 4).map((issue) => (
+                {latestIssues.slice(1, 7).map((issue) => (
                   <IssueCard key={issue.id} issue={issue} />
                 ))}
               </div>
+              {latestIssues.length > 7 && (
+                <div className="mt-10 border-t border-gray-200 pt-8">
+                  <h3 className="font-serif font-bold text-xl text-navy mb-4">
+                    More local coverage
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {latestIssues.slice(7, 12).map((issue) => (
+                      <Link
+                        key={issue.id}
+                        href={`/issues/${issue.slug}`}
+                        className="rounded-md bg-white px-4 py-3 text-sm font-medium text-navy hover:bg-gold/10"
+                      >
+                        {cleanIssueTitle(issue.title)}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
               {latestIssues.length > 4 && (
                 <div className="text-center mt-8">
                   <Link href="/issues" className="btn-secondary inline-block">
