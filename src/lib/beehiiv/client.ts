@@ -5,6 +5,7 @@ import type {
   BeehiivSubscriptionCreate,
   BeehiivSubscriptionResponse,
 } from "./types";
+import { SITE_CONFIG } from "@/lib/seo/constants";
 
 const BEEHIIV_API_URL = "https://api.beehiiv.com/v2";
 
@@ -13,17 +14,17 @@ function wait(ms: number): Promise<void> {
 }
 
 function getApiKey(): string {
-  const apiKey = process.env.BEEHIIV_API_KEY;
+  const apiKey = process.env[SITE_CONFIG.beehiiv.apiKeyEnv];
   if (!apiKey) {
-    throw new Error("BEEHIIV_API_KEY environment variable is not set");
+    throw new Error(`${SITE_CONFIG.beehiiv.apiKeyEnv} environment variable is not set`);
   }
   return apiKey;
 }
 
 function getPublicationId(): string {
-  const publicationId = process.env.BEEHIIV_PUBLICATION_ID;
+  const publicationId = process.env[SITE_CONFIG.beehiiv.publicationIdEnv];
   if (!publicationId) {
-    throw new Error("BEEHIIV_PUBLICATION_ID environment variable is not set");
+    throw new Error(`${SITE_CONFIG.beehiiv.publicationIdEnv} environment variable is not set`);
   }
   return publicationId;
 }

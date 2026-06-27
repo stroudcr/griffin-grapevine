@@ -1,11 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Issue } from "@/lib/beehiiv/types";
-import {
-  getIssueDisplayTitle,
-  getIssueSummary,
-  getIssueTags,
-} from "@/lib/seo/issues";
+import { SITE_CONFIG } from "@/lib/seo/constants";
+import { getIssueDisplayTitle, getIssueSummary } from "@/lib/seo/issues";
 
 interface IssueCardProps {
   issue: Issue;
@@ -15,7 +12,6 @@ interface IssueCardProps {
 export function IssueCard({ issue, featured = false }: IssueCardProps) {
   const displayTitle = getIssueDisplayTitle(issue);
   const summary = getIssueSummary(issue, featured ? 190 : 130);
-  const tags = getIssueTags(issue);
   const formattedDate = issue.publishDate.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -24,47 +20,51 @@ export function IssueCard({ issue, featured = false }: IssueCardProps) {
 
   if (featured) {
     return (
-      <article className="card group">
+      <article className="hover-lift overflow-hidden rounded-[2rem] border border-[rgb(29_36_64_/_0.12)] bg-white/82 shadow-[0_24px_70px_rgb(20_24_38_/_0.12)]">
         <Link href={`/issues/${issue.slug}`} className="block">
-          {issue.thumbnailUrl && (
-            <div className="mb-4 -mx-6 -mt-6 overflow-hidden rounded-t-lg">
-              <Image
-                src={issue.thumbnailUrl}
-                alt={displayTitle}
-                width={800}
-                height={400}
-                quality={75}
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+          <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="surface-tint flex flex-col justify-between p-6 sm:p-8">
+              <div>
+                <div className="mb-5 flex flex-wrap items-center gap-3 text-sm text-slate">
+                  <time dateTime={issue.publishDate.toISOString()}>{formattedDate}</time>
+                  <span className="sponsor-label">Latest Issue</span>
+                </div>
+                <h2 className="headline-balance mb-4 text-3xl font-semibold text-ink sm:text-4xl">
+                  {displayTitle}
+                </h2>
+                {summary && (
+                  <p className="copy-balance max-w-xl text-base text-slate-deep sm:text-lg">
+                    {summary}
+                  </p>
+                )}
+              </div>
+              <div className="mt-8 inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-ink-soft">
+                <span>Read this issue</span>
+                <span aria-hidden="true">→</span>
+              </div>
             </div>
-          )}
-          <div className="flex items-center gap-2 text-sm text-slate mb-2">
-            <time dateTime={issue.publishDate.toISOString()}>{formattedDate}</time>
-            <span className="inline-block px-2 py-0.5 bg-gold/10 text-gold text-xs font-medium rounded">
-              Latest
-            </span>
-          </div>
-          <h2 className="font-serif font-bold text-2xl text-navy group-hover:text-navy-dark transition-colors mb-2">
-            {displayTitle}
-          </h2>
-          {summary && (
-            <p className="text-slate line-clamp-3">{summary}</p>
-          )}
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {tags.map((tag) => (
-                <span
-                  key={`${tag.type}-${tag.slug}`}
-                  className="inline-flex rounded-full bg-gold/10 px-2.5 py-1 text-xs font-medium text-navy"
-                >
-                  {tag.label}
-                </span>
-              ))}
+
+            <div className="media-sweep relative min-h-[18rem] overflow-hidden bg-[rgb(29_36_64_/_0.08)]">
+              {issue.thumbnailUrl ? (
+                <Image
+                  src={issue.thumbnailUrl}
+                  alt={displayTitle}
+                  fill
+                  quality={75}
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-end bg-[radial-gradient(circle_at_top_left,_rgba(177,142,87,0.35),_transparent_40%),linear-gradient(180deg,_#2c3657_0%,_#171d31_100%)] p-6 text-white sm:p-8">
+                  <div>
+                    <p className="eyebrow mb-3 text-white before:bg-[rgba(255,255,255,0.45)]">From the Desk</p>
+                    <p className="max-w-xs text-sm leading-7 text-white/78">
+                      Local government, events, schools, and community stories from across {SITE_CONFIG.location.county}.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-          <div className="mt-4 text-navy font-medium text-sm group-hover:underline">
-            Read local coverage →
           </div>
         </Link>
       </article>
@@ -72,29 +72,26 @@ export function IssueCard({ issue, featured = false }: IssueCardProps) {
   }
 
   return (
-    <article className="card group">
-      <Link href={`/issues/${issue.slug}`} className="block">
-        <div className="flex items-center gap-2 text-sm text-slate mb-2">
-          <time dateTime={issue.publishDate.toISOString()}>{formattedDate}</time>
+    <article className="hover-lift h-full rounded-[1.75rem] border border-[rgb(29_36_64_/_0.12)] bg-white/78">
+      <Link href={`/issues/${issue.slug}`} className="flex h-full flex-col p-5 sm:p-6">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <time dateTime={issue.publishDate.toISOString()} className="text-sm text-slate">
+            {formattedDate}
+          </time>
+          <span className="h-px flex-1 bg-[rgb(29_36_64_/_0.1)]" />
         </div>
-        <h3 className="font-serif font-bold text-lg text-navy group-hover:text-navy-dark transition-colors mb-2">
+        <h3 className="headline-balance text-2xl font-semibold text-ink">
           {displayTitle}
         </h3>
         {summary && (
-          <p className="text-slate text-sm line-clamp-2">{summary}</p>
+          <p className="copy-balance mt-3 flex-1 text-slate">
+            {summary}
+          </p>
         )}
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {tags.slice(0, 2).map((tag) => (
-              <span
-                key={`${tag.type}-${tag.slug}`}
-                className="inline-flex rounded-full bg-gold/10 px-2 py-0.5 text-xs font-medium text-navy"
-              >
-                {tag.label}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-ink-soft">
+          <span>Open issue</span>
+          <span aria-hidden="true">→</span>
+        </div>
       </Link>
     </article>
   );

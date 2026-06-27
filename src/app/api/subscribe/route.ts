@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSubscription } from "@/lib/beehiiv/client";
+import { SITE_CONFIG } from "@/lib/seo/constants";
 
 // Simple email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
       utm_campaign: optionalString(utm_campaign),
       utm_content: optionalString(utm_content),
       utm_term: optionalString(utm_term),
-      referring_site: process.env.NEXT_PUBLIC_SITE_URL || "https://www.griffingrapevine.com",
+      referring_site: SITE_CONFIG.url,
     });
 
     return NextResponse.json({

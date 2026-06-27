@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { FormEvent, useState } from "react";
+import { SITE_CONFIG } from "@/lib/seo/constants";
 
 interface SubscribeFormProps {
   variant?: "hero" | "inline" | "card";
@@ -53,11 +54,14 @@ function trackMetaLead() {
   }
 
   window.fbq("track", "Lead", {
-    content_name: "griffin_grapevine_newsletter",
+    content_name: SITE_CONFIG.newsletter.signupContentName,
   });
 }
 
-export function SubscribeForm({ variant = "inline", className = "" }: SubscribeFormProps) {
+export function SubscribeForm({
+  variant = "inline",
+  className = "",
+}: SubscribeFormProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -90,7 +94,7 @@ export function SubscribeForm({ variant = "inline", className = "" }: SubscribeF
       }
 
       setStatus("success");
-      setMessage("Welcome to the Griffin Grapevine!");
+      setMessage(data.message || SITE_CONFIG.newsletter.successMessage);
       trackMetaLead();
       setEmail("");
     } catch (error) {
@@ -101,21 +105,19 @@ export function SubscribeForm({ variant = "inline", className = "" }: SubscribeF
 
   if (status === "success") {
     return (
-      <div className={`text-center p-6 bg-white rounded-lg border border-gold ${className}`}>
-        <svg
-          className="w-12 h-12 text-gold mx-auto mb-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <p className="text-navy font-serif font-semibold text-lg">{message}</p>
+      <div className={`surface-panel rounded-[2rem] p-6 text-center sm:p-8 ${className}`}>
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[rgb(177_142_87_/_0.12)] text-accent">
+          <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.7}
+              d="M8.25 12.75l2.25 2.25 5.25-6.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <p className="mb-2 font-serif text-2xl font-semibold text-ink">You&apos;re on the list.</p>
+        <p className="mx-auto max-w-md text-slate">{message}</p>
       </div>
     );
   }
@@ -123,84 +125,79 @@ export function SubscribeForm({ variant = "inline", className = "" }: SubscribeF
   if (variant === "hero") {
     return (
       <form onSubmit={handleSubmit} className={className}>
-        <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            className="flex-1 px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-navy focus:border-transparent text-slate"
-            disabled={status === "loading"}
-          />
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            className="btn-primary whitespace-nowrap disabled:opacity-50"
-          >
-            {status === "loading" ? "Subscribing..." : "Subscribe Free"}
-          </button>
+        <div className="surface-panel rounded-[2rem] p-4 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="input-field flex-1"
+              disabled={status === "loading"}
+            />
+            <button type="submit" disabled={status === "loading"} className="btn-primary min-w-[11rem] disabled:opacity-60">
+              {status === "loading" ? "Subscribing..." : "Subscribe Free"}
+            </button>
+          </div>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="status-note">{SITE_CONFIG.newsletter.deliveryPromise}</p>
+            {status === "error" ? (
+              <p className="text-sm text-red-700">{message}</p>
+            ) : (
+              <p className="text-sm text-ink-soft">{SITE_CONFIG.newsletter.heroAudience}</p>
+            )}
+          </div>
         </div>
-        {status === "error" && (
-          <p className="text-red-600 text-sm mt-2 text-center">{message}</p>
-        )}
-        <p className="text-slate text-sm mt-3 text-center">
-          Join thousands of Spalding County residents. Free, weekly delivery.
-        </p>
       </form>
     );
   }
 
   if (variant === "card") {
     return (
-      <div className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}>
-        <h3 className="font-serif font-bold text-xl text-navy mb-2">
-          Stay in the loop
+      <div className={`surface-panel rounded-[2rem] p-6 sm:p-8 ${className}`}>
+        <p className="eyebrow mb-4">Newsletter</p>
+        <h3 className="headline-balance mb-2 font-serif text-3xl font-semibold text-ink">
+          Stay ahead of the next local headline.
         </h3>
-        <p className="text-slate text-sm mb-4">
-          Get local news delivered to your inbox every week.
+        <p className="mb-5 max-w-lg text-slate">
+          Get the {SITE_CONFIG.name} in your inbox each week with community reporting, local events, and the stories neighbors actually talk about.
         </p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-navy focus:border-transparent text-slate mb-3"
+            className="input-field"
             disabled={status === "loading"}
           />
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            className="btn-primary w-full disabled:opacity-50"
-          >
+          <button type="submit" disabled={status === "loading"} className="btn-primary w-full disabled:opacity-60">
             {status === "loading" ? "Subscribing..." : "Subscribe Free"}
           </button>
-          {status === "error" && (
-            <p className="text-red-600 text-sm mt-2">{message}</p>
+          {status === "error" ? (
+            <p className="text-sm text-red-700">{message}</p>
+          ) : (
+            <p className="status-note">Free to join. No paywall. No clutter.</p>
           )}
         </form>
       </div>
     );
   }
 
-  // Inline variant
   return (
-    <form onSubmit={handleSubmit} className={`flex gap-2 ${className}`}>
+    <form onSubmit={handleSubmit} className={`flex flex-col gap-3 sm:flex-row ${className}`}>
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Enter your email"
-        className="flex-1 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-navy focus:border-transparent text-slate text-sm"
+        className="input-field flex-1"
         disabled={status === "loading"}
       />
-      <button
-        type="submit"
-        disabled={status === "loading"}
-        className="btn-primary text-sm disabled:opacity-50"
-      >
-        {status === "loading" ? "..." : "Subscribe"}
+      <button type="submit" disabled={status === "loading"} className="btn-primary min-w-[10rem] disabled:opacity-60">
+        {status === "loading" ? "Working..." : "Subscribe"}
       </button>
+      {status === "error" && <p className="text-sm text-red-700 sm:basis-full">{message}</p>}
     </form>
   );
 }

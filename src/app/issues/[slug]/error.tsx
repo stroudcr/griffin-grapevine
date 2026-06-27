@@ -18,19 +18,18 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell min-h-screen">
       <Header />
 
-      <main className="flex-1 flex items-center justify-center bg-paper px-4">
-        <div className="max-w-md w-full text-center">
-          <h1 className="font-serif font-bold text-3xl text-navy mb-4">
+      <main className="page-frame flex min-h-[52vh] items-center justify-center py-16">
+        <div className="surface-panel w-full max-w-md rounded-[2.25rem] p-8 text-center sm:p-10">
+          <h1 className="headline-balance text-3xl font-semibold text-ink">
             Failed to load this issue
           </h1>
-          <p className="text-slate mb-8">
-            We couldn&apos;t load this newsletter issue. It might not exist or there
-            could be a temporary problem.
+          <p className="mt-4 text-slate">
+            We couldn&apos;t load this newsletter issue. It might not exist or there could be a temporary problem.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="mt-8 flex justify-center gap-3">
             <button onClick={() => reset()} className="btn-primary">
               Try again
             </button>

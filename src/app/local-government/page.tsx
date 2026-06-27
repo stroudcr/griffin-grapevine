@@ -1,15 +1,13 @@
 import { Metadata } from "next";
 import { LocalCoveragePage } from "@/components/LocalCoveragePage";
-import { SITE_CONFIG } from "@/lib/seo/constants";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Spalding County Local Government",
   description:
     "Follow Spalding County local government news, including commission meetings, city decisions, zoning, elections, public safety, and development.",
-  alternates: {
-    canonical: `${SITE_CONFIG.url}/local-government`,
-  },
-};
+  path: "/local-government",
+});
 
 export default function LocalGovernmentPage() {
   return (

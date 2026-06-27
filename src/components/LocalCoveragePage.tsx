@@ -27,6 +27,22 @@ interface LocalCoveragePageProps {
   }[];
 }
 
+function archiveHref({
+  canonicalPath,
+  topicSlug,
+  citySlug,
+}: {
+  canonicalPath: string;
+  topicSlug?: string;
+  citySlug?: string;
+}) {
+  if (citySlug || canonicalPath === "/griffin-ga-news") {
+    return `/issues?city=${citySlug || "griffin"}`;
+  }
+
+  return topicSlug ? `/issues?topic=${topicSlug}` : "/issues";
+}
+
 export async function LocalCoveragePage({
   title,
   eyebrow,
@@ -59,82 +75,118 @@ export async function LocalCoveragePage({
     })),
     title
   );
+  const browseHref = archiveHref({ canonicalPath, topicSlug, citySlug });
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell min-h-screen">
       <JsonLd data={itemListSchema} />
       <Header />
 
-      <main className="flex-1">
-        <section className="bg-white border-b border-gray-200 py-14">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p className="text-sm font-semibold uppercase tracking-wider text-gold mb-4">
-              {eyebrow}
-            </p>
-            <h1 className="font-serif font-bold text-3xl sm:text-5xl text-navy mb-5">
-              {title}
-            </h1>
-            <p className="text-lg sm:text-xl text-slate leading-relaxed">
-              {description}
-            </p>
+      <main>
+        <section className="section-rule py-14 sm:py-18">
+          <div className="page-frame pt-14">
+            <div className="max-w-4xl">
+              <p className="eyebrow mb-5">{eyebrow}</p>
+              <h1 className="headline-balance text-5xl font-semibold text-ink sm:text-6xl">
+                {title}
+              </h1>
+              <p className="copy-balance mt-5 max-w-3xl text-lg text-slate sm:text-xl">
+                {description}
+              </p>
+            </div>
           </div>
         </section>
 
-        <section className="py-12 bg-paper">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              {sections.map((section) => (
-                <div key={section.title} className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h2 className="font-serif font-bold text-xl text-navy mb-3">
-                    {section.title}
-                  </h2>
-                  <p className="text-sm text-slate leading-relaxed">
-                    {section.body}
-                  </p>
-                </div>
-              ))}
+        <section className="py-8 sm:py-12">
+          <div className="page-frame grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
+            <div className="surface-panel rounded-[2.25rem] p-7 sm:p-10">
+              <p className="eyebrow mb-4">What we cover</p>
+              <div className="space-y-5">
+                {sections.map((section) => (
+                  <div key={section.title} className="border-b border-[rgb(29_36_64_/_0.1)] pb-5 last:border-b-0 last:pb-0">
+                    <h2 className="mb-2 font-serif text-2xl font-semibold text-ink">
+                      {section.title}
+                    </h2>
+                    <p className="text-slate">
+                      {section.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-              <div>
-                <h2 className="font-serif font-bold text-2xl text-navy mb-2">
-                  Recent coverage
-                </h2>
-                <p className="text-slate">
-                  Latest Griffin Grapevine issues related to this topic.
-                </p>
+            <div className="surface-tint rounded-[2rem] p-7 sm:p-10">
+              <h2 className="headline-balance text-4xl font-semibold text-ink">
+                A weekly read for people who live nearby.
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-slate">
+                We collect the practical local items that are easy to miss: public meetings, school notes, new businesses, weekend events, and small stories with real neighborhood value.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href={browseHref} className="btn-primary">
+                  Browse the archive
+                </Link>
+                <Link href="/#subscribe" className="btn-secondary">
+                  Subscribe free
+                </Link>
               </div>
-              <Link href={canonicalPath === "/griffin-ga-news" ? "/issues?city=griffin" : `/issues?topic=${topicSlug}`} className="btn-secondary inline-block">
-                Browse the archive
+            </div>
+          </div>
+        </section>
+
+        <section className="py-6 sm:py-8">
+          <div className="page-frame">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="eyebrow mb-4">Recent coverage</p>
+                <h2 className="headline-balance text-3xl font-semibold text-ink sm:text-4xl">
+                  Latest issues related to this topic.
+                </h2>
+              </div>
+              <Link href={browseHref} className="btn-secondary self-start sm:self-auto">
+                Open filtered archive
               </Link>
             </div>
 
             {filteredIssues.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="news-grid news-grid-3">
                 {filteredIssues.map((issue) => (
                   <IssueCard key={issue.id} issue={issue} />
                 ))}
               </div>
             ) : (
-              <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-                <p className="text-slate mb-6">
+              <div className="surface-panel rounded-[2rem] p-8 text-center sm:p-10">
+                <p className="mx-auto mb-6 max-w-2xl text-slate">
                   New coverage is added weekly. Subscribe to get the next issue.
                 </p>
-                <SubscribeForm variant="inline" className="max-w-md mx-auto" />
+                <SubscribeForm variant="inline" className="mx-auto max-w-xl" />
               </div>
             )}
           </div>
         </section>
 
-        <section className="py-12 bg-white border-t border-gray-200">
-          <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="font-serif font-bold text-2xl text-navy mb-4">
-              Get Spalding County news in your inbox
-            </h2>
-            <p className="text-slate mb-6">
-              Free weekly local news from Griffin Grapevine.
-            </p>
-            <SubscribeForm variant="card" />
+        <section className="pb-16 pt-8 sm:pb-20">
+          <div className="page-frame">
+            <div className="surface-panel rounded-[2.25rem] p-7 sm:p-10 lg:flex lg:items-end lg:justify-between lg:gap-10">
+              <div className="max-w-2xl">
+                <p className="eyebrow mb-4">Local tips</p>
+                <h2 className="headline-balance text-3xl font-semibold text-ink sm:text-4xl">
+                  Help us catch what Spalding County is talking about.
+                </h2>
+                <p className="mt-4 text-slate">
+                  Send tips about public decisions, events, openings, school news, and community notes.
+                </p>
+              </div>
+              <Link href="/contact" className="btn-primary mt-6 lg:mt-0">
+                Contact the newsroom
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="pb-16 sm:pb-20">
+          <div className="page-frame">
+            <SubscribeForm variant="inline" className="mx-auto max-w-2xl" />
           </div>
         </section>
       </main>

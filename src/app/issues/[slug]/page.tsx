@@ -1,6 +1,7 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Header, Footer, SubscribeForm, JsonLd, IssueCard } from "@/components";
 import { transformPost } from "@/lib/beehiiv/posts";
 import { getAllPosts, getPostById } from "@/lib/beehiiv/client";
@@ -16,12 +17,7 @@ import {
 } from "@/lib/seo/issues";
 import { sanitizeBeehiivContent } from "@/lib/sanitization";
 
-// Route Segment Config
-// Enable dynamic params to allow new newsletter slugs not pre-generated at build time
 export const dynamicParams = true;
-
-// Revalidate every 5 minutes to match Beehiiv API cache timing
-// This ensures pages stay fresh while maintaining good performance
 export const revalidate = 300;
 
 interface Props {
@@ -31,7 +27,6 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
 
-  // Get post from the lightweight cached list - no need to fetch full content for metadata
   let allPosts: Awaited<ReturnType<typeof getAllPosts>> = [];
   try {
     allPosts = await getAllPosts({ expand: [] });
@@ -43,6 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     };
   }
+
   const post = allPosts.find((p) => p.slug === slug);
 
   if (!post) {
@@ -51,11 +47,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  // Transform to Issue format for metadata
   const issue = transformPost(post);
-
   const description = getIssueSeoDescription(issue);
-
   const articleUrl = `${SITE_CONFIG.url}/issues/${slug}`;
   const seoTitle = getIssueSeoTitle(issue);
   const displayTitle = getIssueDisplayTitle(issue);
@@ -65,18 +58,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       absolute: seoTitle,
     },
     description,
-    authors: issue.authors?.map((a) => ({ name: a.name })) || [{ name: "Griffin Grapevine" }],
+    authors: issue.authors?.map((a) => ({ name: a.name })) || [{ name: SITE_CONFIG.name }],
     openGraph: {
       title: seoTitle,
       description,
       type: "article",
       publishedTime: issue.publishDate.toISOString(),
-      authors: issue.authors?.map((a) => a.name).filter((name): name is string => Boolean(name)) || ["Griffin Grapevine"],
+      authors: issue.authors?.map((a) => a.name).filter((name): name is string => Boolean(name)) || [SITE_CONFIG.name],
       section: "Local News",
-      tags: ["Spalding County", "Georgia", "local news", "Griffin", "Orchard Hill", "Sunny Side"],
+      tags: [
+        SITE_CONFIG.location.county,
+        SITE_CONFIG.location.state,
+        "local news",
+        ...SITE_CONFIG.cities,
+      ],
       images: issue.thumbnailUrl
-        ? [{ url: issue.thumbnailUrl, width: 1200, height: 630 }]
-        : [{ url: SITE_CONFIG.defaultOgImage, width: 1200, height: 630 }],
+        ? [{ url: issue.thumbnailUrl, width: 1200, height: 630, alt: displayTitle }]
+        : [{ url: SITE_CONFIG.defaultOgImage, width: 1200, height: 630, alt: displayTitle }],
     },
     twitter: {
       card: "summary_large_image",
@@ -104,7 +102,6 @@ export async function generateStaticParams() {
 export default async function IssuePage({ params }: Props) {
   const { slug } = await params;
 
-  // First, get the post ID from the lightweight cached list.
   const allPosts = await getAllPosts({ expand: [] });
   const post = allPosts.find((p) => p.slug === slug);
 
@@ -112,8 +109,6 @@ export default async function IssuePage({ params }: Props) {
     notFound();
   }
 
-  // Fetch the full post content by ID. If Beehiiv has a transient issue during
-  // prerendering, keep the article page buildable from the list metadata.
   let fullPost = post;
   try {
     fullPost = await getPostById(post.id);
@@ -127,9 +122,7 @@ export default async function IssuePage({ params }: Props) {
   const allIssues = allPosts.map(transformPost);
   const currentIndex = allIssues.findIndex((item) => item.slug === slug);
   const adjacent = {
-    // Previous = newer (lower index since sorted desc by date)
     prev: currentIndex > 0 ? allIssues[currentIndex - 1] : null,
-    // Next = older (higher index)
     next: currentIndex >= 0 && currentIndex < allIssues.length - 1
       ? allIssues[currentIndex + 1]
       : null,
@@ -138,9 +131,8 @@ export default async function IssuePage({ params }: Props) {
   const displayTitle = getIssueDisplayTitle(issue);
   const storyDeck = getIssueStoryDeck(issue);
   const issueTags = getIssueTags(issue);
+  const articleUrl = `${SITE_CONFIG.url}/issues/${slug}`;
 
-  // Sanitize HTML content from Beehiiv API to prevent XSS attacks
-  // Defense-in-depth: Even though Beehiiv strips scripts, we apply our own sanitization
   const sanitizedContent = issue.content
     ? sanitizeBeehiivContent(issue.content, {
         defaultImageAlt: displayTitle,
@@ -148,77 +140,92 @@ export default async function IssuePage({ params }: Props) {
       })
     : "";
 
-  // Generate structured data schemas
   const newsArticleSchema = generateNewsArticleSchema(issue, slug);
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Home", url: SITE_CONFIG.url },
     { name: "Issues", url: `${SITE_CONFIG.url}/issues` },
-    { name: displayTitle, url: `${SITE_CONFIG.url}/issues/${slug}` },
+    { name: displayTitle, url: articleUrl },
   ]);
 
+  const formattedDate = issue.publishDate.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell min-h-screen">
       <JsonLd data={newsArticleSchema} />
       <JsonLd data={breadcrumbSchema} />
 
       <Header />
 
-      <main className="flex-1">
-        {/* Breadcrumb navigation */}
-        <section className="bg-white border-b border-gray-200 py-6">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav aria-label="Breadcrumb">
-              <ol className="flex items-center gap-2 text-sm">
+      <main>
+        <section className="relative isolate overflow-hidden">
+          <div className="absolute inset-0">
+            {issue.thumbnailUrl ? (
+              <>
+                <Image
+                  src={issue.thumbnailUrl}
+                  alt={displayTitle}
+                  fill
+                  priority
+                  loading="eager"
+                  quality={75}
+                  sizes="100vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,24,38,0.3)_0%,rgba(20,24,38,0.8)_100%)]" />
+              </>
+            ) : (
+              <div className="h-full w-full bg-[radial-gradient(circle_at_top_left,_rgba(177,142,87,0.24),_transparent_30%),linear-gradient(180deg,_#222a47_0%,_#171d31_100%)]" />
+            )}
+          </div>
+
+          <div className="page-frame relative py-14 sm:py-18 lg:py-24">
+            <nav aria-label="Breadcrumb" className="mb-10 text-sm text-white/72">
+              <ol className="flex flex-wrap items-center gap-3">
                 <li>
-                  <Link href="/" className="text-slate hover:text-navy">
-                    Home
-                  </Link>
+                  <Link href="/" className="hover:text-white">Home</Link>
                 </li>
-                <li className="text-slate">/</li>
+                <li aria-hidden="true">/</li>
                 <li>
-                  <Link href="/issues" className="text-slate hover:text-navy">
-                    Issues
-                  </Link>
+                  <Link href="/issues" className="hover:text-white">Issues</Link>
                 </li>
-                <li className="text-slate">/</li>
-                <li className="text-navy font-medium truncate max-w-[200px]">
-                  {issue.title}
-                </li>
+                <li aria-hidden="true">/</li>
+                <li className="max-w-[18rem] truncate text-white">{displayTitle}</li>
               </ol>
             </nav>
-          </div>
-        </section>
 
-        {/* Issue Content */}
-        <article className="bg-white">
-          <header className="border-b border-gray-200 bg-paper py-12">
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex flex-wrap items-center gap-3 text-sm text-slate mb-4">
-                <span className="font-medium text-gold">Spalding County Local News</span>
-                <span aria-hidden="true">/</span>
-                <time dateTime={issue.publishDate.toISOString()}>
-                  {issue.publishDate.toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </time>
-              </div>
-              <h1 className="font-serif font-bold text-3xl sm:text-4xl lg:text-5xl text-navy mb-5">
+            <div className="max-w-4xl">
+              <p className="mb-4 inline-flex items-center gap-3 rounded-full border border-white/12 bg-white/6 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/78">
+                <span className="h-2 w-2 rounded-full bg-accent" />
+                Spalding County Local News
+              </p>
+              <h1 className="headline-balance text-4xl font-semibold leading-[0.94] text-white sm:text-6xl">
                 {displayTitle}
               </h1>
+              <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-white/72">
+                <time dateTime={issue.publishDate.toISOString()}>{formattedDate}</time>
+                {issue.authors?.[0]?.name && (
+                  <>
+                    <span className="h-1 w-1 rounded-full bg-white/30" />
+                    <span>By {issue.authors[0].name}</span>
+                  </>
+                )}
+              </div>
               {storyDeck && (
-                <p className="text-lg sm:text-xl text-slate leading-relaxed">
+                <p className="copy-balance mt-6 max-w-3xl text-lg leading-8 text-white/78 sm:text-xl">
                   {storyDeck}
                 </p>
               )}
               {issueTags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-6">
+                <div className="mt-6 flex flex-wrap gap-2">
                   {issueTags.map((tag) => (
                     <Link
                       key={`${tag.type}-${tag.slug}`}
                       href={tag.type === "topic" ? `/issues?topic=${tag.slug}` : `/issues?city=${tag.slug}`}
-                      className="inline-flex rounded-full bg-white px-3 py-1.5 text-sm font-medium text-navy border border-gray-200"
+                      className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-sm font-medium text-white/82 hover:bg-white/14"
                     >
                       {tag.label}
                     </Link>
@@ -226,30 +233,38 @@ export default async function IssuePage({ params }: Props) {
                 </div>
               )}
             </div>
-          </header>
+          </div>
+        </section>
 
-          {sanitizedContent ? (
-            <div
-              className="newsletter-content"
-              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-            />
-          ) : (
-            <div className="py-12 bg-paper text-center">
-              <p className="text-slate">
-                Content is not available. Please check back later.
-              </p>
-            </div>
-          )}
-        </article>
+        <section className="section-rule py-10 sm:py-12">
+          <div className="page-frame pt-10">
+            <article className="surface-panel rounded-[2.25rem] px-5 py-6 sm:px-8 sm:py-8 lg:px-12">
+              {sanitizedContent ? (
+                <div className="newsletter-content p-0">
+                  <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
+                </div>
+              ) : (
+                <div className="py-16 text-center">
+                  <p className="eyebrow mb-4 justify-center">Content unavailable</p>
+                  <p className="mx-auto max-w-2xl text-slate">
+                    This issue&apos;s article body is not available right now. Please check back shortly.
+                  </p>
+                </div>
+              )}
+            </article>
+          </div>
+        </section>
 
-        {/* Related local coverage */}
         {relatedIssues.length > 0 && (
-          <section className="py-12 bg-paper border-t border-gray-200">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h2 className="font-serif font-bold text-2xl text-navy mb-6">
-                Related local coverage
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <section className="py-6 sm:py-8">
+            <div className="page-frame">
+              <div className="mb-6 max-w-2xl">
+                <p className="eyebrow mb-4">Related local coverage</p>
+                <h2 className="headline-balance text-3xl font-semibold text-ink sm:text-4xl">
+                  Keep reading around this beat.
+                </h2>
+              </div>
+              <div className="news-grid news-grid-3">
                 {relatedIssues.map((relatedIssue) => (
                   <IssueCard key={relatedIssue.id} issue={relatedIssue} />
                 ))}
@@ -258,43 +273,58 @@ export default async function IssuePage({ params }: Props) {
           </section>
         )}
 
-        {/* Subscribe CTA (after first section) */}
-        <section className="py-8 bg-white border-y border-gray-200">
-          <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SubscribeForm variant="card" />
+        <section className="py-6 sm:py-8">
+          <div className="page-frame">
+            <div className="surface-tint rounded-[2rem] p-7 sm:p-9 lg:flex lg:items-end lg:justify-between lg:gap-10">
+              <div className="max-w-2xl">
+                <p className="eyebrow mb-4">Inbox edition</p>
+                <h2 className="headline-balance text-3xl font-semibold text-ink sm:text-4xl">
+                  Read the next issue before it reaches the archive.
+                </h2>
+                <p className="mt-4 text-slate">
+                  Subscribe for the weekly edition and follow along as new reporting lands.
+                </p>
+              </div>
+              <div className="mt-6 w-full max-w-xl lg:mt-0">
+                <SubscribeForm variant="hero" />
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* Navigation between issues */}
-        <section className="py-12 bg-paper">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row gap-4 justify-between">
+        <section className="pb-16 pt-8 sm:pb-20">
+          <div className="page-frame">
+            <div className="grid gap-4 md:grid-cols-2">
               {adjacent.next ? (
                 <Link
                   href={`/issues/${adjacent.next.slug}`}
-                  className="card group flex-1"
+                  className="hover-lift rounded-[1.75rem] border border-[rgb(29_36_64_/_0.12)] bg-white/78 p-6"
                 >
-                  <div className="text-sm text-slate mb-1">← Previous Issue</div>
-                  <div className="font-serif font-bold text-navy group-hover:text-navy-dark transition-colors">
-                    {adjacent.next.title}
-                  </div>
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-ink-soft">
+                    Previous issue
+                  </p>
+                  <h3 className="headline-balance text-2xl font-semibold text-ink">
+                    {getIssueDisplayTitle(adjacent.next)}
+                  </h3>
                 </Link>
               ) : (
-                <div className="flex-1" />
+                <div />
               )}
 
               {adjacent.prev ? (
                 <Link
                   href={`/issues/${adjacent.prev.slug}`}
-                  className="card group flex-1 text-right"
+                  className="hover-lift rounded-[1.75rem] border border-[rgb(29_36_64_/_0.12)] bg-white/78 p-6 md:text-right"
                 >
-                  <div className="text-sm text-slate mb-1">Next Issue →</div>
-                  <div className="font-serif font-bold text-navy group-hover:text-navy-dark transition-colors">
-                    {adjacent.prev.title}
-                  </div>
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-ink-soft">
+                    Next issue
+                  </p>
+                  <h3 className="headline-balance text-2xl font-semibold text-ink">
+                    {getIssueDisplayTitle(adjacent.prev)}
+                  </h3>
                 </Link>
               ) : (
-                <div className="flex-1" />
+                <div />
               )}
             </div>
           </div>

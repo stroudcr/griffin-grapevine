@@ -2,28 +2,26 @@ import "server-only";
 import { getPosts, getAllPosts, getPostBySlug } from "./client";
 import type { BeehiivPost, Issue } from "./types";
 
-// Transform Beehiiv post to Issue format
+const MAX_EXCERPT_LENGTH = 200;
+
 export function transformPost(post: BeehiivPost): Issue {
   const publishDate = post.publish_date
     ? new Date(post.publish_date * 1000)
     : new Date();
+  const displayedDate = post.displayed_date
+    ? new Date(post.displayed_date * 1000)
+    : undefined;
+  const content = choosePublicIssueContent(
+    post.content?.free?.web,
+    post.content?.free?.email,
+    post.content?.free?.rss
+  );
 
-  const preferredContent =
-    post.content?.free?.web ||
-    post.content?.free?.email ||
-    post.content?.free?.rss ||
-    "";
-
-  // Extract excerpt from metadata, subtitle, or content.
-  let excerpt = post.meta_default_description || post.subtitle || "";
-  if (!excerpt && preferredContent) {
-    // Strip HTML and take first 200 chars
-    const textContent = preferredContent
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-    excerpt = textContent.substring(0, 200) + (textContent.length > 200 ? "..." : "");
-  }
+  const fallbackExcerpt = content ? excerptFromHtml(content) : "";
+  const excerpt =
+    cleanPlainText(post.meta_default_description) ||
+    cleanPlainText(post.subtitle) ||
+    fallbackExcerpt;
 
   return {
     id: post.id,
@@ -31,17 +29,67 @@ export function transformPost(post: BeehiivPost): Issue {
     subtitle: post.subtitle,
     slug: post.slug,
     publishDate,
+    displayedDate,
     thumbnailUrl: post.thumbnail_url,
     excerpt,
-    content: preferredContent,
+    content,
     webUrl: post.web_url,
-    metaTitle: post.meta_default_title,
-    metaDescription: post.meta_default_description,
+    metaTitle: cleanPlainText(post.meta_default_title),
+    metaDescription: cleanPlainText(post.meta_default_description),
+    contentTags: post.content_tags,
     authors: post.authors?.map((a) => ({
       name: a.name,
       avatar: a.profile_picture,
     })),
   };
+}
+
+function choosePublicIssueContent(
+  webContent: string | undefined,
+  emailContent: string | undefined,
+  rssContent: string | undefined
+): string | undefined {
+  if (emailContent && hasSponsorAdContent(emailContent) && !hasSponsorAdContent(webContent)) {
+    return emailContent;
+  }
+
+  return webContent || emailContent || rssContent;
+}
+
+function hasSponsorAdContent(content: string | undefined): boolean {
+  return Boolean(
+    content &&
+      (/\/ad_network\//i.test(content) ||
+        /_bhiiv=opp_/i.test(content) ||
+        /In partnership with/i.test(content))
+  );
+}
+
+export function cleanPlainText(value: string | undefined): string {
+  if (!value) {
+    return "";
+  }
+
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function excerptFromHtml(html: string): string {
+  const textContent = cleanPlainText(
+    html
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, " ")
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&amp;/gi, "&")
+      .replace(/&quot;/gi, "\"")
+      .replace(/&#x27;|&#39;/gi, "'")
+  );
+
+  if (textContent.length <= MAX_EXCERPT_LENGTH) {
+    return textContent;
+  }
+
+  return `${textContent.slice(0, MAX_EXCERPT_LENGTH).trimEnd()}...`;
 }
 
 export async function getLatestIssues(count: number = 6): Promise<Issue[]> {
@@ -70,9 +118,7 @@ export async function getAdjacentIssues(
   }
 
   return {
-    // Previous = newer (lower index since sorted desc by date)
     prev: currentIndex > 0 ? allIssues[currentIndex - 1] : null,
-    // Next = older (higher index)
     next: currentIndex < allIssues.length - 1 ? allIssues[currentIndex + 1] : null,
   };
 }

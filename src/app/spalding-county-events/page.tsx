@@ -1,15 +1,13 @@
 import { Metadata } from "next";
 import { LocalCoveragePage } from "@/components/LocalCoveragePage";
-import { SITE_CONFIG } from "@/lib/seo/constants";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Spalding County Events",
   description:
     "Find Spalding County events, weekend calendars, festivals, ceremonies, concerts, markets, and local things to do from Griffin Grapevine.",
-  alternates: {
-    canonical: `${SITE_CONFIG.url}/spalding-county-events`,
-  },
-};
+  path: "/spalding-county-events",
+});
 
 export default function SpaldingCountyEventsPage() {
   return (

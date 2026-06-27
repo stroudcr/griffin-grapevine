@@ -13,6 +13,7 @@ export interface BeehiivPost {
   platform: "web" | "email" | "both";
   thumbnail_url?: string;
   web_url?: string;
+  content_tags?: string[];
   content?: {
     free?: {
       web?: string;
@@ -78,12 +79,14 @@ export interface Issue {
   subtitle?: string;
   slug: string;
   publishDate: Date;
+  displayedDate?: Date;
   thumbnailUrl?: string;
   excerpt?: string;
   content?: string;
   webUrl?: string;
   metaTitle?: string;
   metaDescription?: string;
+  contentTags?: string[];
   authors?: {
     name?: string;
     avatar?: string;

@@ -17,20 +17,16 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-paper px-4">
-      <div className="max-w-md w-full text-center">
-        <h1 className="font-serif font-bold text-4xl text-navy mb-4">
+    <div className="page-shell flex min-h-screen items-center justify-center px-4">
+      <div className="surface-panel w-full max-w-md rounded-[2.25rem] p-8 text-center sm:p-10">
+        <h1 className="headline-balance text-4xl font-semibold text-ink">
           Something went wrong
         </h1>
-        <p className="text-slate mb-8">
-          We encountered an unexpected error. Please try again or return to the
-          home page.
+        <p className="mt-4 text-slate">
+          We encountered an unexpected error. Please try again or return to the home page.
         </p>
-        <div className="flex gap-4 justify-center">
-          <button
-            onClick={() => reset()}
-            className="btn-primary"
-          >
+        <div className="mt-8 flex justify-center gap-3">
+          <button onClick={() => reset()} className="btn-primary">
             Try again
           </button>
           <Link href="/" className="btn-secondary">

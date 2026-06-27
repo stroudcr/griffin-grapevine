@@ -3,15 +3,15 @@ const sharp = require('sharp');
 const path = require('path');
 
 async function generateOGImage() {
-  const logoPath = path.join(__dirname, '../public/For_Logo.PNG');
-  const outputPath = path.join(__dirname, '../public/og-default.jpg');
+  const logoPath = path.join(__dirname, '../public/horizontal.jpg');
+  const outputPath = path.join(__dirname, '../public/griffin-og-image.png');
 
   try {
     // OG image dimensions
     const ogWidth = 1200;
     const ogHeight = 630;
 
-    // Navy color from your brand (matching the theme)
+    // Navy color from the publication brand.
     const navyColor = '#1c1e4d';
 
     // Calculate logo dimensions (make it 70% of the width, centered)
@@ -38,15 +38,15 @@ async function generateOGImage() {
         gravity: 'center'
       }
     ])
-    .jpeg({ quality: 90 })
+    .png({ quality: 90 })
     .toFile(outputPath);
 
-    console.log(`✅ OG image generated successfully at ${outputPath}`);
+    console.log(`OG image generated successfully at ${outputPath}`);
     console.log(`   Dimensions: ${ogWidth}x${ogHeight}px`);
-    console.log(`   Format: JPEG`);
+    console.log("   Format: PNG");
 
   } catch (error) {
-    console.error('❌ Error generating OG image:', error);
+    console.error('Error generating OG image:', error);
     process.exit(1);
   }
 }

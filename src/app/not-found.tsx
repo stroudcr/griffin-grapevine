@@ -3,14 +3,14 @@ import { Header, Footer } from "@/components";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell min-h-screen">
       <Header />
 
-      <main className="flex-1 flex items-center justify-center bg-paper">
-        <div className="text-center px-4 py-16">
-          <div className="w-20 h-20 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-6">
+      <main className="page-frame flex min-h-[52vh] items-center justify-center py-16">
+        <div className="surface-panel max-w-xl rounded-[2.25rem] p-8 text-center sm:p-12">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[rgb(177_142_87_/_0.12)] text-accent">
             <svg
-              className="w-10 h-10 text-gold"
+              className="h-10 w-10"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -18,26 +18,25 @@ export default function NotFound() {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={1.7}
                 d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
           </div>
 
-          <h1 className="font-serif font-bold text-4xl text-navy mb-4">
-            Page Not Found
+          <h1 className="headline-balance text-4xl font-semibold text-ink">
+            Page not found
           </h1>
-          <p className="text-slate text-lg mb-8 max-w-md mx-auto">
-            Sorry, we couldn&apos;t find the page you&apos;re looking for. It may have
-            been moved or no longer exists.
+          <p className="mx-auto mt-4 max-w-md text-lg text-slate">
+            Sorry, we couldn&apos;t find the page you&apos;re looking for. It may have moved or no longer exists.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/" className="btn-primary inline-block">
-              Go Home
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/" className="btn-primary">
+              Go home
             </Link>
-            <Link href="/issues" className="btn-secondary inline-block">
-              Browse Issues
+            <Link href="/issues" className="btn-secondary">
+              Browse issues
             </Link>
           </div>
         </div>

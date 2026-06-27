@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 interface MetaPixelProps {
-  pixelId: string;
+  pixelId?: string;
 }
 
 export function MetaPixel({ pixelId }: MetaPixelProps) {

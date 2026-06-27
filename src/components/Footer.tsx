@@ -1,124 +1,104 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { Logo } from "./Logo";
 import { SITE_CONFIG } from "@/lib/seo/constants";
+
+function SocialIcon({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/5 text-white/88 transition-colors hover:border-white/25 hover:bg-white/10 hover:text-white"
+      aria-label={label}
+    >
+      {children}
+    </a>
+  );
+}
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-navy text-white mt-auto">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Brand column */}
-          <div className="md:col-span-2">
-            <div className="mb-3">
-              <Link href="/">
-                <Image
-                  src="/horizontal.jpg"
-                  alt="Griffin Grapevine"
-                  width={1215}
-                  height={238}
-                  quality={75}
-                  className="h-20 w-auto"
-                />
-              </Link>
-            </div>
-            <p className="text-gray-100 text-sm max-w-sm">
-              Your trusted source for news and events in Spalding County, Georgia.
-              Delivered weekly to your inbox.
+    <footer className="page-shell-dark mt-auto text-white">
+      <div className="page-frame py-14 sm:py-16">
+        <div className="grid gap-10 border-b border-white/10 pb-10 lg:grid-cols-[1.3fr_0.9fr_0.8fr]">
+          <div className="max-w-xl">
+            <Logo variant="stacked" className="text-white" />
+            <p className="copy-balance mt-5 text-base leading-8 text-white/72">
+              {SITE_CONFIG.phrases.communityDescription}
             </p>
           </div>
 
-          {/* Navigation column */}
-          <div>
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-white">
-              Navigation
-            </h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/" className="text-gray-100 hover:text-white text-sm transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/issues" className="text-gray-100 hover:text-white text-sm transition-colors">
-                  Issues
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-gray-100 hover:text-white text-sm transition-colors">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link href="/advertise" className="text-gray-100 hover:text-white text-sm transition-colors">
-                  Advertise
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-gray-100 hover:text-white text-sm transition-colors">
-                  Contact
-                </Link>
-              </li>
-            </ul>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
+            <div>
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.26em] text-white/58">
+                Browse
+              </p>
+              <div className="flex flex-col gap-3 text-sm text-white/78">
+                <Link href="/" className="hover:text-white">Home</Link>
+                <Link href="/issues" className="hover:text-white">Issues</Link>
+                <Link href="/griffin-ga-news" className="hover:text-white">Griffin News</Link>
+                <Link href="/spalding-county-events" className="hover:text-white">Events</Link>
+                <Link href="/local-government" className="hover:text-white">Government</Link>
+                <Link href="/about" className="hover:text-white">About</Link>
+                <Link href="/advertise" className="hover:text-white">Advertise</Link>
+                <Link href="/contact" className="hover:text-white">Contact</Link>
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.26em] text-white/58">
+                Resources
+              </p>
+              <div className="flex flex-col gap-3 text-sm text-white/78">
+                <Link href="/privacy" className="hover:text-white">Privacy Policy</Link>
+                <Link href="/terms" className="hover:text-white">Terms of Service</Link>
+              </div>
+            </div>
           </div>
 
-          {/* Legal column */}
-          <div>
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-white">
-              Resources
-            </h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/privacy" className="text-gray-100 hover:text-white text-sm transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-gray-100 hover:text-white text-sm transition-colors">
-                  Terms of Service
-                </Link>
-              </li>
-            </ul>
+          <div className="rounded-[1.75rem] border border-white/10 bg-white/6 p-6">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.26em] text-white/58">
+              Follow
+            </p>
+            <p className="mb-5 text-sm leading-7 text-white/72">
+              Reach us with tips, sponsorship questions, or community updates.
+            </p>
+            <Link href="/contact" className="btn-secondary mb-5 w-full border-white/18 bg-white/8 text-white hover:bg-white/12">
+              Contact the newsroom
+            </Link>
+            <div className="flex items-center gap-3">
+              {SITE_CONFIG.social.facebook && (
+                <SocialIcon href={SITE_CONFIG.social.facebook} label="Facebook">
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12S0 5.446 0 12.073c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.49 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                </SocialIcon>
+              )}
+              {SITE_CONFIG.social.instagram && (
+                <SocialIcon href={SITE_CONFIG.social.instagram} label="Instagram">
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.205 0 3.585.013 4.85.07 3.252.15 4.771 1.692 4.92 4.92.057 1.265.069 1.644.069 4.848 0 3.206-.012 3.585-.07 4.85-.148 3.227-1.664 4.77-4.919 4.919-1.266.058-1.645.069-4.85.069-3.204 0-3.583-.011-4.848-.07-3.26-.148-4.772-1.698-4.92-4.919-.057-1.265-.069-1.644-.069-4.849 0-3.204.012-3.583.07-4.849.148-3.227 1.664-4.77 4.919-4.919C8.417 2.175 8.796 2.163 12 2.163zm0-2.163C8.741 0 8.332.014 7.052.072 2.694.272.273 2.69.072 7.052.014 8.332 0 8.741 0 12c0 3.258.014 3.668.072 4.948.2 4.357 2.618 6.78 6.98 6.979 1.28.059 1.689.073 4.948.073 3.258 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.668-.072-4.948-.196-4.354-2.617-6.78-6.98-6.979C15.668.014 15.258 0 12 0zm0 5.838A6.162 6.162 0 1 0 12 18a6.162 6.162 0 0 0 0-12.162zm0 10.161A3.999 3.999 0 1 1 12 8a3.999 3.999 0 0 1 0 7.999zm6.406-11.845a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z" />
+                  </svg>
+                </SocialIcon>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-8 pt-6 border-t border-navy-dark">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-gray-200 text-sm">
-              © {currentYear} Griffin Grapevine. All rights reserved.
-            </p>
-            <div className="flex items-center gap-6">
-              {/* Social links - Hidden until Griffin Grapevine accounts are created */}
-              {SITE_CONFIG.social.facebook && (
-                <a
-                  href={SITE_CONFIG.social.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white hover:text-gold transition-colors"
-                  aria-label="Facebook"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                  </svg>
-                </a>
-              )}
-              {SITE_CONFIG.social.instagram && (
-                <a
-                  href={SITE_CONFIG.social.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white hover:text-gold transition-colors"
-                  aria-label="Instagram"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                  </svg>
-                </a>
-              )}
-            </div>
-          </div>
+        <div className="flex flex-col gap-4 pt-6 text-sm text-white/56 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {currentYear} {SITE_CONFIG.name}. All rights reserved.</p>
+          <p>Serving {SITE_CONFIG.phrases.shortCoverage}.</p>
         </div>
       </div>
     </footer>

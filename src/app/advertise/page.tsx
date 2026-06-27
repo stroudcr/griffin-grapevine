@@ -1,115 +1,105 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { Header, Footer } from "@/components";
-import { SITE_CONFIG } from "@/lib/seo/constants";
+import { Footer, Header } from "@/components";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
-  title: "Advertise in Spalding County",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Advertise | Reach Spalding County Residents",
   description:
     "Advertise to engaged Spalding County residents. Sponsorship opportunities in our Griffin, Orchard Hill, and Sunny Side newsletter reaching local readers weekly.",
-  alternates: {
-    canonical: `${SITE_CONFIG.url}/advertise`,
-  },
-};
+  path: "/advertise",
+});
 
 export default function AdvertisePage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell min-h-screen">
       <Header />
 
-      <main className="flex-1">
-        {/* Page Header */}
-        <section className="bg-white border-b border-gray-200 py-12">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="font-serif font-bold text-3xl sm:text-4xl text-navy mb-4">
-              Advertise with Us
-            </h1>
-            <p className="text-slate text-lg">
-              Reach engaged Spalding County residents who care about their community.
-            </p>
+      <main>
+        <section className="section-rule py-14 sm:py-18">
+          <div className="page-frame pt-14">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.42fr)] lg:items-end">
+              <div className="max-w-3xl">
+                <p className="eyebrow mb-5">Advertise</p>
+                <h1 className="headline-balance text-5xl font-semibold text-ink sm:text-6xl">
+                  Reach readers who already care about this community.
+                </h1>
+                <p className="copy-balance mt-5 text-lg text-slate sm:text-xl">
+                  Sponsorship in the Griffin Grapevine places your business inside a trusted weekly local read, not next to generic social scroll.
+                </p>
+              </div>
+
+              <div className="surface-panel rounded-[2rem] p-6">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-ink-soft">
+                  Best fit
+                </p>
+                <div className="space-y-3 text-sm leading-7 text-slate">
+                  <p>Restaurants, retail, and neighborhood services</p>
+                  <p>Healthcare, real estate, and professional practices</p>
+                  <p>Events, nonprofits, and organizations serving county residents</p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* Content */}
-        <section className="py-12 bg-paper">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="prose prose-lg prose-slate max-w-none">
-              <h2>Why Sponsor the Griffin Grapevine?</h2>
-              <p>
-                The Griffin Grapevine reaches an engaged audience of Spalding County
-                residents who actively read our newsletter every week. Our readers
-                are invested in their community and trust the Griffin Grapevine as a
-                reliable source of local information.
-              </p>
+        <section className="py-6 sm:py-8">
+          <div className="page-frame grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="surface-panel rounded-[2.25rem] p-7 sm:p-10">
+              <div className="prose prose-lg prose-slate">
+                <h2>Why sponsor the Griffin Grapevine?</h2>
+                <p>
+                  The Griffin Grapevine reaches engaged Spalding County residents who actively want neighborhood reporting in their inbox. That creates a stronger context for sponsors than broad social reach alone.
+                </p>
 
-              <h2>Sponsorship Benefits</h2>
-              <ul>
-                <li>
-                  <strong>Targeted Reach:</strong> Your message goes directly to
-                  Spalding County residents, the people most likely to become your
-                  customers.
-                </li>
-                <li>
-                  <strong>High Engagement:</strong> Newsletter readers are more
-                  engaged than social media followers, with higher open and click
-                  rates.
-                </li>
-                <li>
-                  <strong>Community Credibility:</strong> Association with trusted
-                  local content builds positive brand perception.
-                </li>
-                <li>
-                  <strong>Flexible Formats:</strong> We offer various sponsorship
-                  options to fit your budget and goals.
-                </li>
-              </ul>
+                <h2>Sponsorship benefits</h2>
+                <ul>
+                  <li><strong>Targeted reach:</strong> your message goes directly to Spalding County residents and households.</li>
+                  <li><strong>High attention:</strong> newsletter readers arrive with intent and spend time with the edition.</li>
+                  <li><strong>Community credibility:</strong> appearing alongside trusted reporting supports positive brand recognition.</li>
+                  <li><strong>Flexible placement:</strong> newsletter and website sponsorship formats can support different goals.</li>
+                </ul>
 
-              <h2>Sponsorship Options</h2>
+                <h2>Sponsorship options</h2>
+                <h3>Newsletter sponsorship</h3>
+                <p>
+                  Feature your business inside the weekly edition with a dedicated sponsor presentation, short description, and clear call to action.
+                </p>
 
-              <h3>Newsletter Sponsorship</h3>
-              <p>
-                Your business featured prominently in the weekly newsletter with a
-                dedicated section including your logo, description, and call to
-                action.
-              </p>
-
-              <h3>Website Placement</h3>
-              <p>
-                Sponsor placement on our website&apos;s homepage and issue pages,
-                reaching visitors browsing our content.
-              </p>
-
-              <h2>Who Should Advertise?</h2>
-              <p>The Griffin Grapevine is perfect for:</p>
-              <ul>
-                <li>Local restaurants and retail businesses</li>
-                <li>Real estate agents and mortgage lenders</li>
-                <li>Healthcare providers and dental practices</li>
-                <li>Home services (plumbers, electricians, landscapers)</li>
-                <li>Local events and festivals</li>
-                <li>Professional services (attorneys, accountants, financial advisors)</li>
-                <li>Nonprofits and community organizations</li>
-              </ul>
-
-              <h2>Get Started</h2>
-              <p>
-                Interested in reaching Spalding County residents? Contact us to
-                discuss sponsorship options and pricing. We&apos;ll work with you to
-                create a package that fits your goals and budget.
-              </p>
+                <h3>Website placement</h3>
+                <p>
+                  Extend that visibility across the site for readers browsing current and archived issues.
+                </p>
+              </div>
             </div>
 
-            {/* Contact CTA */}
-            <div className="mt-12 bg-white rounded-lg border border-gray-200 p-8 text-center">
-              <h3 className="font-serif font-bold text-xl text-navy mb-4">
-                Ready to reach Spalding County?
-              </h3>
-              <p className="text-slate mb-6">
-                Contact us to learn more about sponsorship opportunities.
-              </p>
-              <Link href="/contact" className="btn-primary inline-block">
-                Contact Us
-              </Link>
+            <div className="space-y-6">
+              <div className="surface-tint rounded-[2rem] p-6 sm:p-8">
+                <p className="eyebrow mb-4">Ideal sponsors</p>
+                <div className="space-y-3 text-slate">
+                  <p>Local restaurants and retail businesses</p>
+                  <p>Home services, healthcare providers, and dental practices</p>
+                  <p>Real estate, mortgage, and financial services</p>
+                  <p>Community events, nonprofits, and family-focused organizations</p>
+                </div>
+              </div>
+
+              <div className="rounded-[2rem] border border-[rgb(29_36_64_/_0.12)] bg-[linear-gradient(135deg,#201e36_0%,#1d2440_46%,#705a35_140%)] p-7 text-white shadow-[0_26px_80px_rgb(20_24_38_/_0.16)] sm:p-8">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-white/60">
+                  Ready to talk
+                </p>
+                <h2 className="headline-balance text-3xl font-semibold text-white">
+                  Build a local sponsorship package that fits your audience.
+                </h2>
+                <p className="mt-4 text-white/74">
+                  Reach out and we&apos;ll help shape an advertising plan around your goals, timing, and audience.
+                </p>
+                <div className="mt-6">
+                  <Link href="/contact" className="btn-secondary border-white/18 bg-white/10 text-white hover:bg-white/16">
+                    Contact us
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </section>

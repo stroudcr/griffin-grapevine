@@ -14,7 +14,7 @@ export function generateOrganizationSchema() {
     "@type": "NewsMediaOrganization",
     "@id": `${SITE_CONFIG.url}/#organization`,
     name: SITE_CONFIG.name,
-    alternateName: "The Griffin Grapevine",
+    alternateName: `The ${SITE_CONFIG.name}`,
     url: SITE_CONFIG.url,
     logo: {
       "@type": "ImageObject",
@@ -51,8 +51,8 @@ export function generateOrganizationSchema() {
       latitude: SITE_CONFIG.location.latitude,
       longitude: SITE_CONFIG.location.longitude,
     },
-    foundingDate: "2025",
-    description: `${SITE_CONFIG.location.county}'s trusted source for hyperlocal news, events, and community updates covering ${SITE_CONFIG.cities.join(", ")}, Georgia.`,
+    foundingDate: SITE_CONFIG.foundedYear,
+    description: `${SITE_CONFIG.location.county}'s trusted source for hyperlocal news, events, and community updates covering ${SITE_CONFIG.phrases.cityList}, Georgia.`,
   };
 }
 
@@ -94,11 +94,11 @@ export function generateNewsArticleSchema(issue: Issue, slug: string) {
     description,
     image: issue.thumbnailUrl || SITE_CONFIG.defaultOgImage,
     datePublished: issue.publishDate.toISOString(),
-    dateModified: issue.publishDate.toISOString(),
+    dateModified: (issue.displayedDate || issue.publishDate).toISOString(),
     author: issue.authors?.length
       ? issue.authors.map((author) => ({
           "@type": "Person",
-          name: author.name || "Griffin Grapevine Staff",
+          name: author.name || `${SITE_CONFIG.name} Staff`,
         }))
       : [
           {
@@ -131,12 +131,10 @@ export function generateNewsArticleSchema(issue: Issue, slug: string) {
       name: `${SITE_CONFIG.location.county}, ${SITE_CONFIG.location.state}`,
     },
     keywords: [
-      "Spalding County news",
-      "Griffin",
-      "Orchard Hill",
-      "Sunny Side",
+      `${SITE_CONFIG.location.county} news`,
+      ...SITE_CONFIG.cities,
       "local news",
-      "Georgia",
+      SITE_CONFIG.location.state,
       ...articleTags,
     ],
   };
@@ -160,7 +158,7 @@ export function generateBreadcrumbSchema(
 
 export function generateItemListSchema(
   items: { name: string; url: string; datePublished?: Date }[],
-  name = "Griffin Grapevine local news archive"
+  name = `${SITE_CONFIG.name} local news archive`
 ) {
   return {
     "@context": "https://schema.org",

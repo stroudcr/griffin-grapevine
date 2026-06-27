@@ -1,15 +1,13 @@
 import { Metadata } from "next";
 import { LocalCoveragePage } from "@/components/LocalCoveragePage";
-import { SITE_CONFIG } from "@/lib/seo/constants";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Griffin GA News",
   description:
     "Read Griffin GA news from the Griffin Grapevine, including city updates, community events, businesses, schools, weather, and Spalding County stories.",
-  alternates: {
-    canonical: `${SITE_CONFIG.url}/griffin-ga-news`,
-  },
-};
+  path: "/griffin-ga-news",
+});
 
 export default function GriffinGaNewsPage() {
   return (

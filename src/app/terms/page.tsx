@@ -1,34 +1,32 @@
 import { Metadata } from "next";
 import { Header, Footer } from "@/components";
 import { SITE_CONFIG } from "@/lib/seo/constants";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Terms of Service",
   description: "Terms of Service for the Griffin Grapevine newsletter and website.",
-  alternates: {
-    canonical: `${SITE_CONFIG.url}/terms`,
-  },
-};
+  path: "/terms",
+});
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell min-h-screen">
       <Header />
 
-      <main className="flex-1">
-        {/* Page Header */}
-        <section className="bg-white border-b border-gray-200 py-12">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="font-serif font-bold text-3xl sm:text-4xl text-navy mb-4">
+      <main>
+        <section className="section-rule py-14 sm:py-18">
+          <div className="page-frame-narrow pt-14">
+            <h1 className="headline-balance text-5xl font-semibold text-ink sm:text-6xl">
               Terms of Service
             </h1>
-            <p className="text-slate">Last updated: December 21, 2025</p>
+            <p className="mt-5 text-slate">Last updated: December 21, 2025</p>
           </div>
         </section>
 
-        {/* Content */}
-        <section className="py-12 bg-paper">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="pb-16 sm:pb-20">
+          <div className="page-frame-narrow">
+            <div className="surface-panel rounded-[2.25rem] p-7 sm:p-10">
             <div className="prose prose-lg prose-slate max-w-none">
               <h2>Introduction</h2>
               <p>
@@ -36,10 +34,10 @@ export default function TermsPage() {
                 (&quot;Terms&quot;) govern your access to and use of our website
                 located at{" "}
                 <a
-                  href="https://www.griffingrapevine.com"
+                  href={SITE_CONFIG.url}
                   className="text-navy hover:underline"
                 >
-                  www.griffingrapevine.com
+                  {SITE_CONFIG.url.replace(/^https?:\/\//, "")}
                 </a>{" "}
                 and our newsletter service. By accessing or using our services,
                 you agree to be bound by these Terms.
@@ -287,12 +285,13 @@ export default function TermsPage() {
               </p>
               <p>
                 <a
-                  href="mailto:griffin@welldiem.com"
+                  href={`mailto:${SITE_CONFIG.email}`}
                   className="text-navy hover:underline"
                 >
-                  griffin@welldiem.com
+                  {SITE_CONFIG.email}
                 </a>
               </p>
+            </div>
             </div>
           </div>
         </section>

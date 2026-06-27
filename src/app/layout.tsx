@@ -25,38 +25,38 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Griffin Grapevine | Spalding County GA News",
-    template: "%s | Griffin Grapevine",
+    default: `${SITE_CONFIG.name} | ${SITE_CONFIG.location.county} GA News & Community Updates`,
+    template: `%s | ${SITE_CONFIG.name} - ${SITE_CONFIG.location.county} News`,
   },
   description:
     "Your trusted source for Spalding County GA news. Local news, events, and community updates from Griffin, Orchard Hill, and Sunny Side. Free weekly newsletter.",
   keywords: ALL_KEYWORDS,
-  authors: [{ name: "Griffin Grapevine" }],
-  creator: "Griffin Grapevine",
-  publisher: "Griffin Grapevine",
+  authors: [{ name: SITE_CONFIG.name }],
+  creator: SITE_CONFIG.name,
+  publisher: SITE_CONFIG.name,
   openGraph: {
     type: "website",
     locale: "en_US",
     url: SITE_CONFIG.url,
     siteName: SITE_CONFIG.name,
-    title: "Griffin Grapevine | Spalding County GA News",
+    title: `${SITE_CONFIG.name} | ${SITE_CONFIG.location.county} GA News & Community Updates`,
     description:
       "Your trusted source for Spalding County GA news. Local news, events, and community updates from Griffin, Orchard Hill, and Sunny Side.",
     images: [
       {
-        url: `${SITE_CONFIG.url}/griffin-og-image.png`,
+        url: SITE_CONFIG.defaultOgImage,
         width: 1200,
         height: 630,
-        alt: "Griffin Grapevine - Local News with Character for Spalding County, GA",
+        alt: `${SITE_CONFIG.name} - ${SITE_CONFIG.tagline} for ${SITE_CONFIG.location.county}, ${SITE_CONFIG.location.stateCode}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Griffin Grapevine | Spalding County GA News",
+    title: `${SITE_CONFIG.name} | ${SITE_CONFIG.location.county} GA News`,
     description:
       "Your trusted source for Spalding County GA news. Local news from Griffin, Orchard Hill, Sunny Side & more.",
-    images: [`${SITE_CONFIG.url}/griffin-og-image.png`],
+    images: [SITE_CONFIG.defaultOgImage],
   },
   metadataBase: new URL(SITE_CONFIG.url),
   alternates: {
@@ -89,17 +89,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const organizationSchema = generateOrganizationSchema();
-  const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || "";
+  const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim();
+  const shouldRenderVercelAnalytics = process.env.VERCEL === "1";
 
   return (
     <html lang="en">
       <head>
         <JsonLd data={organizationSchema} />
-        <MetaPixel pixelId={metaPixelId} />
       </head>
       <body className={`${inter.variable} ${sourceSerif.variable} antialiased`}>
+        <MetaPixel pixelId={metaPixelId} />
         {children}
-        <Analytics />
+        {shouldRenderVercelAnalytics && <Analytics />}
       </body>
     </html>
   );

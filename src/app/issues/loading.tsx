@@ -2,29 +2,23 @@ import { Header, Footer } from "@/components";
 
 export default function Loading() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-shell min-h-screen">
       <Header />
 
-      <main className="flex-1 bg-paper">
-        {/* Page Header Skeleton */}
-        <section className="bg-white border-b border-gray-200 py-12">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="h-10 bg-gray-200 rounded w-64 animate-pulse mb-4"></div>
-            <div className="h-6 bg-gray-200 rounded w-96 animate-pulse"></div>
+      <main>
+        <section className="section-rule py-14 sm:py-18">
+          <div className="page-frame pt-14">
+            <div className="h-5 w-28 animate-pulse rounded-full bg-[rgb(29_36_64_/_0.12)]" />
+            <div className="mt-5 h-16 max-w-3xl animate-pulse rounded-[1rem] bg-[rgb(29_36_64_/_0.1)]" />
+            <div className="mt-5 h-7 max-w-2xl animate-pulse rounded-full bg-[rgb(29_36_64_/_0.08)]" />
           </div>
         </section>
 
-        {/* Content Skeleton */}
-        <section className="py-12">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section className="py-8 pb-16 sm:pb-20">
+          <div className="page-frame">
+            <div className="news-grid news-grid-3">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="card">
-                  <div className="h-6 bg-gray-200 rounded w-32 animate-pulse mb-2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-full animate-pulse mb-3"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full animate-pulse mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                </div>
+                <div key={i} className="surface-panel h-56 animate-pulse rounded-[1.75rem]" />
               ))}
             </div>
           </div>
