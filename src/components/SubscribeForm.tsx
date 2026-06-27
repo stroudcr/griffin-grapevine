@@ -140,11 +140,11 @@ export function SubscribeForm({
             </button>
           </div>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="status-note">{SITE_CONFIG.newsletter.deliveryPromise}</p>
+            <p className="text-sm font-semibold text-ink-deep">{SITE_CONFIG.newsletter.deliveryPromise}</p>
             {status === "error" ? (
               <p className="text-sm text-red-700">{message}</p>
             ) : (
-              <p className="text-sm text-ink-soft">{SITE_CONFIG.newsletter.heroAudience}</p>
+              <p className="text-sm font-medium text-slate-deep">{SITE_CONFIG.newsletter.heroAudience}</p>
             )}
           </div>
         </div>

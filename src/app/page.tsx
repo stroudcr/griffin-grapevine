@@ -70,10 +70,10 @@ export default async function HomePage() {
                 <SubscribeForm variant="hero" />
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-white/84">
-                <span className="kicker-stat text-white/84 before:bg-[rgb(177_142_87)]">Always free</span>
-                <span className="kicker-stat text-white/84 before:bg-[rgb(177_142_87)]">Weekly delivery</span>
-                <span className="kicker-stat text-white/84 before:bg-[rgb(177_142_87)]">Locally reported</span>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <span className="kicker-stat hero-kicker-stat">Always free</span>
+                <span className="kicker-stat hero-kicker-stat">Weekly delivery</span>
+                <span className="kicker-stat hero-kicker-stat">Locally reported</span>
               </div>
             </div>
 

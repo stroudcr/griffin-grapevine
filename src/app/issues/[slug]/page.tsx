@@ -225,7 +225,7 @@ export default async function IssuePage({ params }: Props) {
                     <Link
                       key={`${tag.type}-${tag.slug}`}
                       href={tag.type === "topic" ? `/issues?topic=${tag.slug}` : `/issues?city=${tag.slug}`}
-                      className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-sm font-medium text-white/82 hover:bg-white/14"
+                      className="issue-hero-tag"
                     >
                       {tag.label}
                     </Link>
