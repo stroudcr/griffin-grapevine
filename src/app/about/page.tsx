@@ -64,6 +64,9 @@ export default function AboutPage() {
                 <p>
                   The Griffin Grapevine exists to keep Spalding County residents informed about what matters most in their community. From local government decisions that affect daily life to small business openings, community events, and high school sports, we cover the stories that bring neighbors together.
                 </p>
+                <p>
+                  Griffin Grapevine is part of <a href="https://www.welldiem.com">WellDiem Company</a>, a network of locally focused publications serving communities across Georgia.
+                </p>
 
                 <h2>Why we started</h2>
                 <p>
