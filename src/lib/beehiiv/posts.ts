@@ -1,6 +1,7 @@
 import "server-only";
 import { getPosts, getAllPosts, getPostBySlug } from "./client";
 import type { BeehiivPost, Issue } from "./types";
+import { choosePublicIssueContent } from "../beehiiv-content";
 
 const MAX_EXCERPT_LENGTH = 200;
 
@@ -42,27 +43,6 @@ export function transformPost(post: BeehiivPost): Issue {
       avatar: a.profile_picture,
     })),
   };
-}
-
-function choosePublicIssueContent(
-  webContent: string | undefined,
-  emailContent: string | undefined,
-  rssContent: string | undefined
-): string | undefined {
-  if (emailContent && hasSponsorAdContent(emailContent) && !hasSponsorAdContent(webContent)) {
-    return emailContent;
-  }
-
-  return webContent || emailContent || rssContent;
-}
-
-function hasSponsorAdContent(content: string | undefined): boolean {
-  return Boolean(
-    content &&
-      (/\/ad_network\//i.test(content) ||
-        /_bhiiv=opp_/i.test(content) ||
-        /In partnership with/i.test(content))
-  );
 }
 
 export function cleanPlainText(value: string | undefined): string {

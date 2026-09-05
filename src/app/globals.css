@@ -349,162 +349,59 @@ img {
   text-decoration: none;
 }
 
+/* Beehiiv supplies the article typography and block spacing. Keep these
+   defaults below its scoped selectors and inline styles in specificity. */
 .newsletter-content {
-  width: min(900px, calc(100vw - 2rem));
+  width: 100%;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 2rem 0 4rem;
+  color: #222;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  overflow-wrap: break-word;
 }
 
-.newsletter-content > div {
+:where(.newsletter-content) :where(h1, h2, h3, h4, h5, h6, p, ul, ol, blockquote, figure, table) {
+  margin: 0;
+  color: inherit;
+  font-family: inherit;
+  letter-spacing: normal;
+}
+
+:where(.newsletter-content) :where(ul, ol) {
+  padding-left: 1.5em;
+  list-style: revert;
+}
+
+:where(.newsletter-content) :where(a) {
+  text-decoration: underline;
+}
+
+:where(.newsletter-content) :where(p, a) {
   max-width: 100%;
 }
 
-.newsletter-content > *:first-child {
-  margin-top: 0;
+:where(.newsletter-content) :where(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.newsletter-content :where(h1, h2, h3, h4) {
-  color: var(--ink-900);
-  font-family: var(--font-serif), Georgia, serif;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
-}
-
-.newsletter-content :where(h1) {
-  font-size: clamp(2.6rem, 5vw, 4.5rem);
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.newsletter-content :where(h2) {
-  font-size: clamp(2rem, 3.4vw, 3rem);
-  margin-top: 3rem;
-  margin-bottom: 1rem;
-}
-
-.newsletter-content :where(h3) {
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
-  margin-top: 2.25rem;
-  margin-bottom: 0.8rem;
-}
-
-.newsletter-content :where(p, li, figcaption, blockquote, td, th) {
-  color: var(--slate-600);
-  font-size: 1.06rem;
-  line-height: 1.9;
-}
-
-.newsletter-content :where(p, ul, ol, blockquote, figure, table) {
-  margin-top: 1.1rem;
-  margin-bottom: 1.1rem;
-}
-
-.newsletter-content :where(ul, ol) {
-  padding-left: 1.35rem;
-}
-
-.newsletter-content :where(li + li) {
-  margin-top: 0.45rem;
-}
-
-.newsletter-content :where(a) {
-  color: var(--ink-900);
-  text-decoration-color: rgb(177 142 87 / 0.5);
-}
-
-.newsletter-content :where(img) {
-  border-radius: 1.5rem;
-  box-shadow: var(--shadow-soft);
-}
-
-.newsletter-content div:has(> a img[src*="/ad_network/"]) {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 0.65rem !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  margin: 1.25rem auto 2rem !important;
-  text-align: center !important;
-}
-
-.newsletter-content div:has(> a img[src*="/ad_network/"]) > p {
-  display: block !important;
-  width: auto !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  color: var(--ink-900) !important;
-  font-size: 0.95rem !important;
-  font-weight: 700 !important;
-  line-height: 1.35 !important;
-  text-align: center !important;
-}
-
-.newsletter-content div:has(> a img[src*="/ad_network/"]) > a {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: auto !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  text-decoration: none;
-}
-
-.newsletter-content div:has(> a img[src*="/ad_network/"]) img[src*="/ad_network/"] {
-  display: block !important;
-  width: min(300px, 100%) !important;
-  max-width: 300px !important;
-  height: auto !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-
-.newsletter-content :where(blockquote) {
-  margin-inline: 0;
-  padding: 1.4rem 1.5rem;
-  border-left: 3px solid var(--sand-400);
-  background: rgb(255 255 255 / 0.76);
-  border-radius: 0 1rem 1rem 0;
-  font-style: italic;
-}
-
-.newsletter-content :where(hr) {
-  border: 0;
-  border-top: 1px solid rgb(29 36 64 / 0.12);
-  margin: 2rem 0;
-}
-
-.newsletter-content :where(table) {
-  width: 100%;
+:where(.newsletter-content) :where(table) {
   border-collapse: collapse;
 }
 
-.newsletter-content :where(th, td) {
-  border-bottom: 1px solid rgb(29 36 64 / 0.1);
-  padding: 0.9rem 0.75rem;
-  text-align: left;
-}
-
-.newsletter-content
-  :where(#content-blocks > .email-card-body > table > tbody > tr:first-child > td > table[style*="margin:0 auto"]) {
-  width: auto;
-  max-width: 100%;
-  margin-inline: auto;
-}
-
-.newsletter-content
-  :where(#content-blocks > .email-card-body > table > tbody > tr:first-child > td > table[style*="margin:0 auto"] td) {
-  border-bottom: 0;
+:where(.newsletter-content) :where(th, td) {
+  border: 0;
   padding: 0;
-  text-align: center;
+  text-align: inherit;
 }
 
 @media (max-width: 767px) {
   .newsletter-content {
-    width: min(100%, calc(100vw - 2rem));
-    overflow-x: clip;
+    width: 100%;
   }
 
   .newsletter-content :where(.beehiiv-shell-root) {

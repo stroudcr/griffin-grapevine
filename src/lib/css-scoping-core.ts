@@ -20,7 +20,7 @@ export function scopeCSS(
   const root = postcss.parse(css);
 
   root.walkRules((rule) => {
-    if (shouldSkipRule(rule, scopeClass, preserveKeyframes)) {
+    if (shouldSkipRule(rule, preserveKeyframes)) {
       return;
     }
 
@@ -32,7 +32,6 @@ export function scopeCSS(
 
 function shouldSkipRule(
   rule: Rule,
-  scopeClass: string,
   preserveKeyframes: boolean
 ): boolean {
   const selector = rule.selector?.trim();
@@ -42,10 +41,6 @@ function shouldSkipRule(
   }
 
   if (selector.startsWith("/*")) {
-    return true;
-  }
-
-  if (selector.startsWith(scopeClass)) {
     return true;
   }
 
@@ -82,14 +77,40 @@ function scopeSelectorList(selectorList: string, scopeClass: string): string {
     selectors.each((selector) => {
       const rawSelector = selector.toString().trim();
 
-      if (!rawSelector || shouldSkipSelector(rawSelector, scopeClass)) {
+      if (!rawSelector || rawSelector === scopeClass || rawSelector.startsWith(`${scopeClass} `)) {
         return;
       }
 
-      selector.prepend(selectorParser.combinator({ value: " " }));
+      // A document's root becomes our content wrapper. In particular, do not
+      // let Beehiiv's body resets or theme variables escape into the app.
+      let replacedRoot = false;
+      while (isDocumentRoot(selector.first)) {
+        selector.first?.remove();
+        replacedRoot = true;
+        const combinator = selector.first;
+        const next = selector.nodes[1];
+        if (
+          combinator?.type === "combinator" &&
+          combinator.value.trim() === "" &&
+          isDocumentRoot(next)
+        ) {
+          combinator.remove();
+        }
+      }
+
+      if (!replacedRoot) {
+        selector.prepend(selectorParser.combinator({ value: " " }));
+      }
       prependScope(selector, scopeClass);
     });
   }).processSync(selectorList);
+}
+
+function isDocumentRoot(node: selectorParser.Node | undefined): boolean {
+  return Boolean(node && (
+    (node.type === "tag" && ["html", "body"].includes(node.value)) ||
+    (node.type === "pseudo" && node.value === ":root")
+  ));
 }
 
 function prependScope(
@@ -102,24 +123,4 @@ function prependScope(
   for (let index = scopeNodes.length - 1; index >= 0; index -= 1) {
     selector.prepend(scopeNodes[index].clone());
   }
-}
-
-function shouldSkipSelector(selector: string, scopeClass: string): boolean {
-  const trimmed = selector.trim();
-
-  if (!trimmed) {
-    return true;
-  }
-
-  if (trimmed.startsWith(scopeClass)) {
-    return true;
-  }
-
-  return (
-    trimmed === ":root" ||
-    trimmed === "html" ||
-    trimmed === "body" ||
-    trimmed.startsWith("html ") ||
-    trimmed.startsWith("body ")
-  );
 }

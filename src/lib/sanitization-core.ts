@@ -38,7 +38,10 @@ export function sanitizeBeehiivContent(
     : "";
 
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-  const rawBodyContent = bodyMatch ? bodyMatch[1] : html;
+  // Styles are reinserted once, after scoping, rather than also leaving raw
+  // style tags in the body where they could override the surrounding website.
+  const rawBodyContent = (bodyMatch ? bodyMatch[1] : html)
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "");
   const bodyContent = stripEmailOnlyMarkup(
     options.stripFirstHeading ? removeFirstHeading(rawBodyContent) : rawBodyContent
   );
@@ -105,15 +108,48 @@ export function sanitizeBeehiivContent(
         "font-size": [/.*/],
         "font-family": [/.*/],
         "font-weight": [/.*/],
+        "font-style": [/.*/],
         "text-align": [/.*/],
+        "text-decoration": [/.*/],
+        "text-decoration-color": [/.*/],
         margin: [/.*/],
+        "margin-top": [/.*/],
+        "margin-right": [/.*/],
+        "margin-bottom": [/.*/],
+        "margin-left": [/.*/],
         padding: [/.*/],
+        "padding-top": [/.*/],
+        "padding-right": [/.*/],
+        "padding-bottom": [/.*/],
+        "padding-left": [/.*/],
         border: [/.*/],
+        "border-top": [/.*/],
+        "border-right": [/.*/],
+        "border-bottom": [/.*/],
+        "border-left": [/.*/],
+        "border-width": [/.*/],
+        "border-style": [/.*/],
+        "border-color": [/.*/],
+        "border-radius": [/.*/],
+        "border-collapse": [/.*/],
+        "border-spacing": [/.*/],
+        "box-sizing": [/.*/],
         width: [/.*/],
         height: [/.*/],
         "max-width": [/.*/],
         display: [/.*/],
+        "flex-direction": [/.*/],
+        "flex-wrap": [/.*/],
+        "align-items": [/.*/],
+        "justify-content": [/.*/],
+        gap: [/.*/],
+        "vertical-align": [/.*/],
         "line-height": [/.*/],
+        "white-space": [/.*/],
+        "word-break": [/.*/],
+        "overflow-wrap": [/.*/],
+        "letter-spacing": [/.*/],
+        opacity: [/.*/],
       },
     },
     textFilter: (text, tagName) => {

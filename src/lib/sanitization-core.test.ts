@@ -3,6 +3,37 @@ import assert from "node:assert/strict";
 
 import { sanitizeBeehiivContent } from "./sanitization-core";
 
+test("preserves web dividers, block padding, line breaks and inline emphasis", () => {
+  const html = `<div style="padding-bottom:12px;padding-left:10px;padding-right:10px;padding-top:12px">
+    <p style="font-size:18px;line-height:1.5;white-space:pre-wrap">First line<br><br>Second line <span style="font-style:italic">emphasis</span></p>
+    <a href="https://example.com" style="text-decoration:underline #FF006A;word-break:break-word">Source</a>
+    </div><div style="font-size:0px;line-height:0px;padding:30px 0px 30px"><div style="margin:0 auto;border-top:5px dashed #EEEEEE;width:97%"></div></div>`;
+  const output = sanitizeBeehiivContent(html);
+  for (const style of ["padding-bottom:12px", "padding-left:10px", "padding-right:10px", "padding-top:12px", "border-top:5px dashed #EEEEEE", "font-style:italic", "white-space:pre-wrap", "text-decoration:underline #FF006A"]) {
+    assert.ok(output.includes(style), `Missing ${style}`);
+  }
+  assert.match(output, /First line<br \/><br \/>Second line/);
+});
+
+test("keeps sponsor flex layout without allowing scripts or unsafe links", () => {
+  const output = sanitizeBeehiivContent(`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding-top:12px">
+    <p>In partnership with</p><a href="https://example.com"><img src="https://example.com/logo.png" onerror="alert(1)"></a>
+    </div><script>alert(1)</script><a href="javascript:alert(1)">Unsafe</a>`);
+  assert.match(output, /flex-direction:column;align-items:center;justify-content:center;gap:12px;padding-top:12px/);
+  assert.match(output, /In partnership with/);
+  assert.doesNotMatch(output, /<script|onerror=|javascript:/);
+});
+
+test("emits body styles once and scopes them away from the website", () => {
+  const output = sanitizeBeehiivContent(`<html><head><style>:root { --wt-primary-color: red; }</style></head>
+    <body><style>body { margin:0 } h2 { padding-bottom:12px }</style><h2>Story</h2></body></html>`);
+  assert.equal(output.match(/<style>/g)?.length, 1);
+  assert.equal(output.match(/padding-bottom:12px/g)?.length, 1);
+  assert.match(output, /\.newsletter-content\s*\{ --wt-primary-color: red;/);
+  assert.match(output, /\.newsletter-content h2/);
+  assert.doesNotMatch(output, /(?:^|[>}])\s*(?:body|:root)\s*\{/);
+});
+
 test("annotates Beehiiv shell wrappers and wide email blocks for mobile normalization", () => {
   const html = `
     <html>

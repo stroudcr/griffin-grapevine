@@ -5,24 +5,32 @@ import postcss from "postcss";
 
 import { scopeCSS } from "./css-scoping-core";
 
-test("scopes regular selectors without changing exempt global selectors", () => {
+test("contains document roots and theme variables inside the newsletter", () => {
   const input = `
     :root { color-scheme: light; }
     body { margin: 0; }
     body .hero { color: red; }
+    html body .story { padding: 12px; }
     p, .lede, * { color: #222; }
   `;
 
   const output = scopeCSS(input);
   const compact = output.replace(/\s+/g, " ");
 
-  assert.match(output, /:root\s*\{\s*color-scheme:\s*light;\s*\}/);
-  assert.match(output, /body\s*\{\s*margin:\s*0;\s*\}/);
-  assert.match(output, /body \.hero\s*\{\s*color:\s*red;\s*\}/);
+  assert.match(output, /\.newsletter-content\s*\{\s*color-scheme:\s*light;\s*\}/);
+  assert.match(output, /\.newsletter-content\s*\{\s*margin:\s*0;\s*\}/);
+  assert.match(output, /\.newsletter-content \.hero\s*\{\s*color:\s*red;\s*\}/);
+  assert.match(output, /\.newsletter-content \.story\s*\{\s*padding:\s*12px;\s*\}/);
+  assert.doesNotMatch(output, /(?:^|\})\s*(?:body|html|:root)\b/);
   assert.match(
     compact,
     /\.newsletter-content p,\s*\.newsletter-content\s+\.lede,\s*\.newsletter-content\s+\*\s*\{/
   );
+});
+
+test("scopes each member of a mixed already-scoped selector list", () => {
+  const output = scopeCSS(".newsletter-content .story, h2 { color: red; }");
+  assert.match(output, /\.newsletter-content \.story,\s*\.newsletter-content\s+h2/);
 });
 
 test("preserves keyframes while scoping nested media query selectors", () => {
