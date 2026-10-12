@@ -286,12 +286,6 @@ img {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-
-
-
-
-
-
 /* Beehiiv supplies the article typography and block spacing. Keep these
    defaults below its scoped selectors and inline styles in specificity. */
 .newsletter-content {
@@ -474,7 +468,13 @@ img {
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 700px) {
+  .news-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
   .news-grid-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

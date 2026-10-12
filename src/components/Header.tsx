@@ -40,7 +40,7 @@ export function Header() {
             </div>
           </div>
 
-          <nav className="hidden items-center gap-2 md:flex">
+          <nav className="hidden items-center gap-1 md:flex">
             {navItems.map((item) => {
               const active = isActive(pathname, item.href);
 
@@ -48,7 +48,7 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  className={`rounded-full px-3 py-2 text-sm font-medium transition-colors lg:px-4 ${
                     active
                       ? "bg-[rgb(29_36_64_/_0.07)] text-ink"
                       : "text-slate hover:bg-[rgb(29_36_64_/_0.04)] hover:text-ink"
@@ -58,7 +58,7 @@ export function Header() {
                 </Link>
               );
             })}
-            <Link href="/#subscribe" className="btn-primary ml-2 text-sm">
+            <Link href="/#subscribe" className="btn-primary ml-2 whitespace-nowrap text-sm">
               Subscribe Free
             </Link>
           </nav>

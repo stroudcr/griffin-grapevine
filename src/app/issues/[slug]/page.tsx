@@ -11,7 +11,6 @@ import {
   getIssueDisplayTitle,
   getIssueSeoDescription,
   getIssueSeoTitle,
-  getIssueStoryDeck,
 } from "@/lib/seo/issues";
 import { sanitizeBeehiivContent } from "@/lib/sanitization";
 
@@ -126,7 +125,6 @@ export default async function IssuePage({ params }: Props) {
       : null,
   };
   const displayTitle = getIssueDisplayTitle(issue);
-  const storyDeck = getIssueStoryDeck(issue);
   const articleUrl = `${SITE_CONFIG.url}/issues/${slug}`;
 
   const sanitizedContent = issue.content
@@ -210,11 +208,6 @@ export default async function IssuePage({ params }: Props) {
                   </>
                 )}
               </div>
-              {storyDeck && (
-                <p className="copy-balance mt-6 max-w-3xl text-lg leading-8 text-white/78 sm:text-xl">
-                  {storyDeck}
-                </p>
-              )}
             </div>
           </div>
         </section>

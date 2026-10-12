@@ -13,7 +13,6 @@ import {
   formatClock,
   groupByDay,
   relativeLabel,
-  townFrom,
 } from "@/lib/listing-format";
 import { SITE_CONFIG } from "@/lib/seo/constants";
 import { buildPageMetadata } from "@/lib/seo/page-metadata";
@@ -55,7 +54,6 @@ function EventRow({
   day: string;
   showDate?: boolean;
 }) {
-  const town = townFrom(listing.whereText);
   const through = runsThrough(listing, day);
   const date = dateParts(day);
 
@@ -89,10 +87,7 @@ function EventRow({
           <p className="copy-balance mt-1.5 leading-7 text-slate-deep">{listing.whatText}</p>
         )}
         {listing.whereText && (
-          <p className="mt-1.5 text-sm text-slate">
-            {town && <span className="font-semibold text-ink-soft">{town} · </span>}
-            {listing.whereText}
-          </p>
+          <p className="mt-1.5 text-sm text-slate">{listing.whereText}</p>
         )}
       </div>
     </li>
