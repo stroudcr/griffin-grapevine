@@ -12,6 +12,15 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm test
-      - run: npm run lint
-      - run: npm run build
+      - name: test
+        run: |
+          set +e
+          npm test > test.txt 2>&1; t=$?
+          npm run lint > lint.txt 2>&1; l=$?
+          npm run build > build.txt 2>&1; b=$?
+          for f in test lint build; do
+            grep -E "not ok|Error|error|✖|Failed|expected|actual|Warning" $f.txt | head -40 | while IFS= read -r line; do echo "::warning title=$f::$line"; done
+          done
+          tail -45 build.txt | while IFS= read -r line; do echo "::notice title=buildtail::$line"; done
+          echo "::notice title=codes::test=$t lint=$l build=$b"
+          [ $t -eq 0 ] && [ $l -eq 0 ] && [ $b -eq 0 ]
