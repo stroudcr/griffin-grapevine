@@ -66,7 +66,7 @@ export default function PrivacyPage() {
               <h2>How We Use Your Information</h2>
               <p>We use the information we collect to:</p>
               <ul>
-                <li>Send you our weekly newsletter</li>
+                <li>Send you our newsletter</li>
                 <li>Respond to your inquiries and messages</li>
                 <li>Improve our website and content</li>
                 <li>Analyze usage patterns to enhance user experience</li>

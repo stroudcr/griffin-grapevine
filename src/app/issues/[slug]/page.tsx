@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Header, Footer, SubscribeForm, JsonLd, IssueCard } from "@/components";
+import { Header, Footer, SubscribeForm, JsonLd } from "@/components";
 import { transformPost } from "@/lib/beehiiv/posts";
 import { getAllPosts, getPostById } from "@/lib/beehiiv/client";
 import { generateNewsArticleSchema, generateBreadcrumbSchema } from "@/lib/seo/schemas";
@@ -12,8 +12,6 @@ import {
   getIssueSeoDescription,
   getIssueSeoTitle,
   getIssueStoryDeck,
-  getIssueTags,
-  getRelatedIssues,
 } from "@/lib/seo/issues";
 import { sanitizeBeehiivContent } from "@/lib/sanitization";
 
@@ -127,10 +125,8 @@ export default async function IssuePage({ params }: Props) {
       ? allIssues[currentIndex + 1]
       : null,
   };
-  const relatedIssues = getRelatedIssues(issue, allIssues);
   const displayTitle = getIssueDisplayTitle(issue);
   const storyDeck = getIssueStoryDeck(issue);
-  const issueTags = getIssueTags(issue);
   const articleUrl = `${SITE_CONFIG.url}/issues/${slug}`;
 
   const sanitizedContent = issue.content
@@ -219,19 +215,6 @@ export default async function IssuePage({ params }: Props) {
                   {storyDeck}
                 </p>
               )}
-              {issueTags.length > 0 && (
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {issueTags.map((tag) => (
-                    <Link
-                      key={`${tag.type}-${tag.slug}`}
-                      href={tag.type === "topic" ? `/issues?topic=${tag.slug}` : `/issues?city=${tag.slug}`}
-                      className="issue-hero-tag"
-                    >
-                      {tag.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </section>
@@ -255,36 +238,12 @@ export default async function IssuePage({ params }: Props) {
           </div>
         </section>
 
-        {relatedIssues.length > 0 && (
-          <section className="py-6 sm:py-8">
-            <div className="page-frame">
-              <div className="mb-6 max-w-2xl">
-                <p className="eyebrow mb-4">Related local coverage</p>
-                <h2 className="headline-balance text-3xl font-semibold text-ink sm:text-4xl">
-                  Keep reading around this beat.
-                </h2>
-              </div>
-              <div className="news-grid news-grid-3">
-                {relatedIssues.map((relatedIssue) => (
-                  <IssueCard key={relatedIssue.id} issue={relatedIssue} />
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
         <section className="py-6 sm:py-8">
           <div className="page-frame">
             <div className="surface-tint rounded-[2rem] p-7 sm:p-9 lg:flex lg:items-end lg:justify-between lg:gap-10">
-              <div className="max-w-2xl">
-                <p className="eyebrow mb-4">Inbox edition</p>
-                <h2 className="headline-balance text-3xl font-semibold text-ink sm:text-4xl">
-                  Read the next issue before it reaches the archive.
-                </h2>
-                <p className="mt-4 text-slate">
-                  Subscribe for the weekly edition and follow along as new reporting lands.
-                </p>
-              </div>
+              <h2 className="headline-balance max-w-md text-3xl font-semibold text-ink">
+                Get the next issue in your inbox
+              </h2>
               <div className="mt-6 w-full max-w-xl lg:mt-0">
                 <SubscribeForm variant="hero" />
               </div>

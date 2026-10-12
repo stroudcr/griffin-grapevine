@@ -84,11 +84,11 @@ export default function TermsPage() {
 
               <h2>Newsletter Subscription</h2>
               <p>
-                Our newsletter is a free service delivered weekly to subscribers.
+                Our newsletter is a free service delivered by email to subscribers.
                 By subscribing, you agree to:
               </p>
               <ul>
-                <li>Receive our weekly newsletter via email</li>
+                <li>Receive our newsletter via email</li>
                 <li>
                   Allow us to collect your email address and subscription
                   metadata

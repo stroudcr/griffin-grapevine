@@ -2,6 +2,7 @@ import sanitizeHtml from "sanitize-html";
 
 import { normalizeBeehiivAttributes } from "./beehiiv-normalization";
 import { scopeCSS } from "./css-scoping-core";
+import { stripMergeTagsFromText, stripMergeTagsFromUrl } from "./merge-tags";
 
 interface SanitizeBeehiivOptions {
   defaultImageAlt?: string;
@@ -157,7 +158,7 @@ export function sanitizeBeehiivContent(
         return "Learn more";
       }
 
-      return text.replace(/SUBSCRIBER_ID/g, "");
+      return stripMergeTagsFromText(text.replace(/SUBSCRIBER_ID/g, ""));
     },
     exclusiveFilter: (frame) => {
       const href = frame.attribs.href || "";
@@ -175,12 +176,17 @@ export function sanitizeBeehiivContent(
       return false;
     },
     transformTags: {
-      "*": (tagName, attribs) => ({
-        tagName,
-        attribs: normalizeBeehiivAttributes(tagName, attribs, {
+      "*": (tagName, attribs) => {
+        const normalized = normalizeBeehiivAttributes(tagName, attribs, {
           defaultImageAlt: options.defaultImageAlt,
-        }),
-      }),
+        });
+
+        if (tagName === "a" && normalized.href) {
+          normalized.href = stripMergeTagsFromUrl(normalized.href);
+        }
+
+        return { tagName, attribs: normalized };
+      },
     },
   });
 

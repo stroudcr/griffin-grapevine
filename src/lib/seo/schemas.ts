@@ -3,7 +3,6 @@ import type { Issue } from "@/lib/beehiiv/types";
 import {
   getIssueDisplayTitle,
   getIssueSeoDescription,
-  getIssueTags,
   stripHtml,
 } from "./issues";
 
@@ -77,7 +76,6 @@ export function generateNewsArticleSchema(issue: Issue, slug: string) {
   const articleUrl = `${SITE_CONFIG.url}/issues/${slug}`;
   const headline = getIssueDisplayTitle(issue);
   const description = getIssueSeoDescription(issue);
-  const articleTags = getIssueTags(issue).map((tag) => tag.label);
   const articleText = stripHtml(issue.content);
 
   return {
@@ -119,7 +117,7 @@ export function generateNewsArticleSchema(issue: Issue, slug: string) {
     },
     isAccessibleForFree: true,
     inLanguage: "en-US",
-    articleSection: articleTags,
+    articleSection: "Local News",
     ...(articleText ? { wordCount: articleText.split(/\s+/).length } : {}),
     copyrightYear: issue.publishDate.getFullYear(),
     copyrightHolder: {
@@ -135,7 +133,6 @@ export function generateNewsArticleSchema(issue: Issue, slug: string) {
       ...SITE_CONFIG.cities,
       "local news",
       SITE_CONFIG.location.state,
-      ...articleTags,
     ],
   };
 }
