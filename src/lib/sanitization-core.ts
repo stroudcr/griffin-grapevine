@@ -2,7 +2,7 @@ import sanitizeHtml from "sanitize-html";
 
 import { normalizeBeehiivAttributes } from "./beehiiv-normalization";
 import { scopeCSS } from "./css-scoping-core";
-import { stripMergeTagsFromText, stripMergeTagsFromUrl } from "./merge-tags";
+import { stripMergeTagsFromText } from "./merge-tags";
 
 interface SanitizeBeehiivOptions {
   defaultImageAlt?: string;
@@ -176,17 +176,12 @@ export function sanitizeBeehiivContent(
       return false;
     },
     transformTags: {
-      "*": (tagName, attribs) => {
-        const normalized = normalizeBeehiivAttributes(tagName, attribs, {
+      "*": (tagName, attribs) => ({
+        tagName,
+        attribs: normalizeBeehiivAttributes(tagName, attribs, {
           defaultImageAlt: options.defaultImageAlt,
-        });
-
-        if (tagName === "a" && normalized.href) {
-          normalized.href = stripMergeTagsFromUrl(normalized.href);
-        }
-
-        return { tagName, attribs: normalized };
-      },
+        }),
+      }),
     },
   });
 

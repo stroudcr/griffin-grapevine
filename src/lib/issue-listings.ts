@@ -79,7 +79,7 @@ function cleanLine(value: string): string {
   return value.replace(/[ \t ]+/g, " ").trim();
 }
 
-/** Removes tracking parameters and unfilled {{merge_tags}} so outbound links stay clean. */
+/** Removes tracking parameters and unfilled {{merge_tags}} so event links stay clean. */
 export function cleanUrl(raw: string): string {
   const url = decodeEntities(raw.trim());
   try {
