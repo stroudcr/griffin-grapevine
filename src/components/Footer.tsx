@@ -46,10 +46,8 @@ export function Footer() {
               </p>
               <div className="flex flex-col gap-3 text-sm text-white/78">
                 <Link href="/" className="hover:text-white">Home</Link>
-                <Link href="/issues" className="hover:text-white">Issues</Link>
-                <Link href="/griffin-ga-news" className="hover:text-white">Griffin News</Link>
                 <Link href="/spalding-county-events" className="hover:text-white">Events</Link>
-                <Link href="/local-government" className="hover:text-white">Government</Link>
+                <Link href="/issues" className="hover:text-white">Archive</Link>
                 <Link href="/about" className="hover:text-white">About</Link>
                 <Link href="/advertise" className="hover:text-white">Advertise</Link>
                 <Link href="/contact" className="hover:text-white">Contact</Link>
@@ -71,11 +69,8 @@ export function Footer() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.26em] text-white/58">
               Follow
             </p>
-            <p className="mb-5 text-sm leading-7 text-white/72">
-              Reach us with tips, sponsorship questions, or community updates.
-            </p>
             <Link href="/contact" className="btn-secondary mb-5 w-full border-white/18 bg-white/8 text-white hover:bg-white/12">
-              Contact the newsroom
+              Send a tip
             </Link>
             <div className="flex items-center gap-3">
               {SITE_CONFIG.social.facebook && (

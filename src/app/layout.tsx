@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_CONFIG.name} - ${SITE_CONFIG.location.county} News`,
   },
   description:
-    "Your trusted source for Spalding County GA news. Local news, events, and community updates from Griffin, Orchard Hill, and Sunny Side. Free weekly newsletter.",
+    "Your trusted source for Spalding County GA news. Local news, events, and community updates from Griffin, Orchard Hill, and Sunny Side. Free newsletter, twice a week.",
   keywords: ALL_KEYWORDS,
   authors: [{ name: SITE_CONFIG.name }],
   creator: SITE_CONFIG.name,

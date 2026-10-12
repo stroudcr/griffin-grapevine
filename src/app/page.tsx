@@ -2,38 +2,114 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Footer, Header, IssueCard, JsonLd, SubscribeForm } from "@/components";
-import { getLatestIssues } from "@/lib/beehiiv/posts";
+import { getLatestIssues, getRecentIssueHtml } from "@/lib/beehiiv/posts";
 import type { Issue } from "@/lib/beehiiv/types";
+import { displayDay, todayIn, upcomingListings, type Listing } from "@/lib/issue-listings";
+import { dateParts, formatClock, relativeLabel, townFrom } from "@/lib/listing-format";
+import { getIssueDisplayTitle, getIssueStoryDeck } from "@/lib/seo/issues";
 import { generateWebsiteSchema } from "@/lib/seo/schemas";
 import { SITE_CONFIG } from "@/lib/seo/constants";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Spalding County News | Local Updates from Griffin and Across Spalding County",
   description:
-    "Get free weekly Spalding County GA news delivered to your inbox. Covering Griffin, Orchard Hill, Sunny Side local news, events, and community updates.",
+    "Free Spalding County GA news twice a week. Local news, events, and public meetings from Griffin, Orchard Hill, and Sunny Side.",
   alternates: {
     canonical: SITE_CONFIG.url,
   },
 };
 
-export default async function HomePage() {
-  let latestIssues: Issue[] = [];
-  let featuredIssue: Issue | null = null;
+const TIME_ZONE = SITE_CONFIG.location.timeZone;
 
-  try {
-    latestIssues = await getLatestIssues(6);
-    featuredIssue = latestIssues[0] || null;
-  } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      console.error("Failed to fetch issues:", error);
-    }
+/** "A, B, and C. Local Spalding County News." → ["A", "B", "C"] */
+function headlinesFrom(issue: Issue): string[] {
+  return getIssueStoryDeck(issue)
+    .replace(/\.\s*$/, "")
+    .split(/,\s+(?:and\s+)?(?=[A-Z0-9“"'])/)
+    .map((headline) => headline.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+}
+
+function nowClock(): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: TIME_ZONE,
+  }).format(new Date());
+}
+
+/** The next few events that haven't already finished today. */
+function nextEvents(listings: Listing[], today: string, count: number): Listing[] {
+  const now = nowClock();
+  return listings
+    .filter((listing) => listing.kind === "event")
+    .filter((listing) => {
+      if (listing.startDate !== today || listing.endDate !== today) return true;
+      const finish = listing.endTime ?? listing.startTime;
+      return !finish || finish >= now;
+    })
+    .slice(0, count);
+}
+
+function EventPreview({ listing, today }: { listing: Listing; today: string }) {
+  const day = displayDay(listing, today);
+  const parts = dateParts(day);
+  const time = listing.startTime ? formatClock(listing.startTime) : null;
+  const town = townFrom(listing.whereText);
+
+  return (
+    <li>
+      <Link
+        href={`/spalding-county-events#day-${day}`}
+        className="hover-lift flex h-full flex-col rounded-[1.5rem] border border-[rgb(29_36_64_/_0.12)] bg-white/80 p-5"
+      >
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent-deep">
+          {relativeLabel(day, today) ?? `${parts.weekdayShort}, ${parts.monthShort} ${parts.day}`}
+          {" · "}
+          {time ? `${time.clock} ${time.meridiem}` : "All day"}
+        </p>
+        <p className="mt-2 font-serif text-xl font-semibold leading-snug text-ink">{listing.title}</p>
+        {town && <p className="mt-auto pt-3 text-sm text-slate">{town}</p>}
+      </Link>
+    </li>
+  );
+}
+
+export default async function HomePage() {
+  const today = todayIn(TIME_ZONE);
+  let latestIssues: Issue[] = [];
+  let listings: Listing[] = [];
+
+  const [issuesResult, htmlResult] = await Promise.allSettled([
+    getLatestIssues(4),
+    getRecentIssueHtml(4),
+  ]);
+
+  if (issuesResult.status === "fulfilled") {
+    latestIssues = issuesResult.value;
+  } else if (process.env.NODE_ENV === "development") {
+    console.error("Failed to fetch issues:", issuesResult.reason);
   }
 
-  const websiteSchema = generateWebsiteSchema();
+  if (htmlResult.status === "fulfilled") {
+    listings = upcomingListings(htmlResult.value, today);
+  } else if (process.env.NODE_ENV === "development") {
+    console.error("Failed to fetch events:", htmlResult.reason);
+  }
+
+  const featuredIssue = latestIssues[0] ?? null;
+  const featuredHeadlines = featuredIssue ? headlinesFrom(featuredIssue) : [];
+  const recentIssues = latestIssues.slice(1, 4);
+  const upcoming = nextEvents(listings, today, 6);
+  const eventCount = listings.filter((listing) => listing.kind === "event").length;
 
   return (
     <div className="page-shell min-h-screen">
-      <JsonLd data={websiteSchema} />
+      <JsonLd data={generateWebsiteSchema()} />
       <Header />
 
       <main>
@@ -49,226 +125,101 @@ export default async function HomePage() {
               sizes="100vw"
               className="object-cover object-center"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(20,24,38,0.78)_0%,rgba(20,24,38,0.56)_42%,rgba(20,24,38,0.28)_100%)]" />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,24,38,0.26)_0%,rgba(20,24,38,0.54)_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(20,24,38,0.82)_0%,rgba(20,24,38,0.6)_45%,rgba(20,24,38,0.32)_100%)]" />
           </div>
 
-          <div className="page-frame relative grid min-h-[calc(100svh-5rem)] items-end gap-10 py-12 sm:py-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.72fr)] lg:py-20">
-            <div className="hero-entrance max-w-3xl text-white">
-              <p className="mb-5 inline-flex items-center gap-3 rounded-full border border-white/16 bg-white/8 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/82">
-                <span className="h-2 w-2 rounded-full bg-accent" />
-                {SITE_CONFIG.name}
-              </p>
-              <h1 className="headline-balance max-w-4xl text-5xl font-semibold leading-[0.92] text-white sm:text-6xl lg:text-7xl">
-                Spalding County news that feels close to home.
+          <div className="page-frame relative grid items-end gap-8 py-14 sm:py-20 lg:min-h-[38rem] lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.8fr)] lg:gap-12">
+            <div className="hero-entrance max-w-2xl text-white">
+              <h1 className="headline-balance text-5xl font-semibold leading-[0.95] text-white sm:text-6xl lg:text-7xl">
+                Spalding County news, twice a week.
               </h1>
-              <p className="copy-balance mt-6 max-w-2xl text-lg leading-8 text-white/82 sm:text-xl">
-                Clear, weekly reporting on the local decisions, openings, events, and community stories shaping life in Griffin and communities across Spalding County.
+              <p className="copy-balance mt-5 max-w-xl text-lg leading-8 text-white/85 sm:text-xl">
+                Local news, events, and public meetings from {SITE_CONFIG.phrases.cityList}. Free in your inbox.
               </p>
 
-              <div id="subscribe" className="hero-entrance-delay mt-8 max-w-2xl">
+              <div id="subscribe" className="hero-entrance-delay mt-8 max-w-xl scroll-mt-28">
                 <SubscribeForm variant="hero" />
               </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <span className="kicker-stat hero-kicker-stat">Always free</span>
-                <span className="kicker-stat hero-kicker-stat">Weekly delivery</span>
-                <span className="kicker-stat hero-kicker-stat">Locally reported</span>
-              </div>
             </div>
 
-            <div className="hero-entrance-delay">
-              <div className="surface-panel rounded-[2rem] bg-[rgb(255_255_255_/_0.78)] p-6 shadow-[0_28px_80px_rgb(20_24_38_/_0.24)] backdrop-blur-xl sm:p-7">
-                <p className="eyebrow mb-4 text-ink before:bg-[rgb(177_142_87_/_0.55)]">Inside the Edition</p>
-                {featuredIssue ? (
-                  <>
-                    <p className="mb-2 text-sm uppercase tracking-[0.18em] text-ink-soft">
-                      Latest issue
-                    </p>
-                    <h2 className="headline-balance text-3xl font-semibold text-ink">
-                      {featuredIssue.title}
-                    </h2>
-                    {featuredIssue.excerpt && (
-                      <p className="copy-balance mt-4 text-base leading-7 text-slate-deep">
-                        {featuredIssue.excerpt}
-                      </p>
-                    )}
-                    <div className="mt-6 flex flex-wrap gap-3">
-                      <Link href={`/issues/${featuredIssue.slug}`} className="btn-primary">
-                        Read the issue
-                      </Link>
-                      <Link href="/issues" className="btn-ghost text-ink hover:bg-[rgb(29_36_64_/_0.05)] hover:text-ink-deep">
-                        Browse the archive
-                      </Link>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p className="mb-2 text-sm uppercase tracking-[0.18em] text-ink-soft">
-                      Weekly briefing
-                    </p>
-                    <h2 className="headline-balance text-3xl font-semibold text-ink">
-                      Start with the next issue in your inbox.
-                    </h2>
-                    <p className="mt-4 text-base leading-7 text-slate-deep">
-                      Our latest edition is published weekly. Subscribe now and you&apos;ll be first to know when the next briefing goes live.
-                    </p>
-                    <div className="mt-6">
-                      <Link href="/issues" className="btn-primary">
-                        Visit the archive
-                      </Link>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="section-rule py-16 sm:py-20">
-          <div className="page-frame pt-16">
-            <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-              <div className="max-w-2xl">
-                <p className="eyebrow mb-4">Fresh reporting</p>
-                <h2 className="headline-balance text-4xl font-semibold text-ink sm:text-5xl">
-                  The week&apos;s local read.
+            {featuredIssue && (
+              <Link
+                href={`/issues/${featuredIssue.slug}`}
+                className="hero-entrance-delay hover-lift block rounded-[1.75rem] border border-white/40 bg-[rgb(255_255_255_/_0.9)] p-6 shadow-[0_28px_80px_rgb(20_24_38_/_0.28)] backdrop-blur-xl sm:p-7"
+              >
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-deep">
+                  Latest issue ·{" "}
+                  {new Intl.DateTimeFormat("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    timeZone: TIME_ZONE,
+                  }).format(featuredIssue.publishDate)}
+                </p>
+                <h2 className="headline-balance mt-2 text-3xl font-semibold text-ink">
+                  {getIssueDisplayTitle(featuredIssue)}
                 </h2>
-                <p className="copy-balance mt-4 text-lg text-slate">
-                  One strong lead edition, then the archive within reach.
+                {featuredHeadlines.length > 0 && (
+                  <ul className="mt-4 space-y-2 text-slate-deep">
+                    {featuredHeadlines.map((headline) => (
+                      <li key={headline} className="flex gap-3 leading-6">
+                        <span aria-hidden="true" className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                        <span>{headline}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="mt-5 text-sm font-semibold text-ink">
+                  Read the issue <span aria-hidden="true">→</span>
                 </p>
-              </div>
-              <Link href="/issues" className="btn-secondary self-start md:self-auto">
-                Open the archive
               </Link>
-            </div>
-
-            {featuredIssue ? (
-              <IssueCard issue={featuredIssue} featured />
-            ) : (
-              <div className="surface-panel rounded-[2rem] p-8 sm:p-10">
-                <p className="eyebrow mb-4">Archive offline</p>
-                <h3 className="headline-balance text-3xl font-semibold text-ink">
-                  The latest issue will appear here as soon as the feed is available.
-                </h3>
-                <p className="mt-4 max-w-2xl text-slate">
-                  The publication archive is temporarily unavailable in this local environment, but subscriptions and the rest of the site remain ready.
-                </p>
-              </div>
             )}
           </div>
         </section>
 
-        <section className="py-4 sm:py-8">
-          <div className="page-frame">
-            <div className="rounded-[2rem] border border-[rgb(29_36_64_/_0.12)] bg-white/72 p-6 shadow-[0_20px_60px_rgb(20_24_38_/_0.08)] sm:p-8">
-              <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <p className="eyebrow mb-4">Recent issues</p>
-                  <h2 className="headline-balance text-3xl font-semibold text-ink sm:text-4xl">
-                    Catch up quickly.
-                  </h2>
-                </div>
-                {latestIssues.length > 3 && (
-                  <Link href="/issues" className="btn-ghost self-start md:self-auto">
-                    View all issues
-                  </Link>
-                )}
-              </div>
-
-              {latestIssues.length > 1 ? (
-                <div className="news-grid news-grid-3">
-                  {latestIssues.slice(1, 4).map((issue) => (
-                    <IssueCard key={issue.id} issue={issue} />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-slate">More recent issues will appear here as they are published.</p>
-              )}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-10 sm:py-14">
-          <div className="page-frame">
-            <div className="mb-8 max-w-2xl">
-              <p className="eyebrow mb-4">Local coverage guides</p>
-              <h2 className="headline-balance text-4xl font-semibold text-ink sm:text-5xl">
-                Start with the local beat you need.
-              </h2>
-            </div>
-            <div className="news-grid news-grid-3">
-              <Link href="/griffin-ga-news" className="hover-lift h-full rounded-[1.75rem] border border-[rgb(29_36_64_/_0.12)] bg-white/78 p-6">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-ink-soft">
-                  Griffin GA news
-                </p>
-                <h3 className="headline-balance text-2xl font-semibold text-ink">
-                  City decisions, schools, events, and neighborhood updates.
-                </h3>
-              </Link>
-              <Link href="/spalding-county-events" className="hover-lift h-full rounded-[1.75rem] border border-[rgb(29_36_64_/_0.12)] bg-white/78 p-6">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-ink-soft">
-                  Spalding County events
-                </p>
-                <h3 className="headline-balance text-2xl font-semibold text-ink">
-                  Weekend plans, markets, ceremonies, and community gatherings.
-                </h3>
-              </Link>
-              <Link href="/local-government" className="hover-lift h-full rounded-[1.75rem] border border-[rgb(29_36_64_/_0.12)] bg-white/78 p-6">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-ink-soft">
-                  Local government
-                </p>
-                <h3 className="headline-balance text-2xl font-semibold text-ink">
-                  County commission, city decisions, public safety, and development.
-                </h3>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 sm:py-20">
-          <div className="page-frame grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
-            <div className="media-sweep overflow-hidden rounded-[2.25rem]">
-              <Image
-                src={SITE_CONFIG.scenicImage}
-                alt={SITE_CONFIG.scenicImageAlt}
-                width={1200}
-                height={900}
-                quality={75}
-                className="h-[24rem] w-full object-cover sm:h-[30rem]"
-              />
-            </div>
-
-            <div className="surface-tint rounded-[2rem] p-7 sm:p-10">
-              <p className="eyebrow mb-4">About the publication</p>
-              <h2 className="headline-balance text-4xl font-semibold text-ink sm:text-5xl">
-                A calmer kind of community news source.
-              </h2>
-              <p className="copy-balance mt-5 text-lg text-slate">
-                The Griffin Grapevine exists for readers who want trustworthy local reporting without the noise. We cover civic decisions, neighborhood business openings, community events, schools, and the people who make Spalding County feel distinct.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/about" className="btn-primary">
-                  Learn more about us
-                </Link>
-                <Link href="/advertise" className="btn-secondary">
-                  Advertising details
+        {upcoming.length > 0 && (
+          <section className="py-14 sm:py-16">
+            <div className="page-frame">
+              <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+                <h2 className="text-3xl font-semibold text-ink sm:text-4xl">Coming up this week</h2>
+                <Link href="/spalding-county-events" className="font-semibold text-ink hover:underline">
+                  All {eventCount} events <span aria-hidden="true">→</span>
                 </Link>
               </div>
+              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {upcoming.map((listing) => (
+                  <EventPreview key={`${listing.title}-${listing.startDate}`} listing={listing} today={today} />
+                ))}
+              </ul>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
+
+        {recentIssues.length > 0 && (
+          <section className="section-rule py-14 sm:py-16">
+            <div className="page-frame pt-14 sm:pt-16">
+              <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+                <h2 className="text-3xl font-semibold text-ink sm:text-4xl">Recent issues</h2>
+                <Link href="/issues" className="font-semibold text-ink hover:underline">
+                  Full archive <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+              <div className="news-grid news-grid-3">
+                {recentIssues.map((issue) => (
+                  <IssueCard key={issue.id} issue={issue} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="pb-16 pt-4 sm:pb-20">
           <div className="page-frame">
-            <div className="overflow-hidden rounded-[2.5rem] border border-[rgb(29_36_64_/_0.12)] bg-[linear-gradient(135deg,#201e36_0%,#1d2440_40%,#6f5731_140%)] px-6 py-10 text-white shadow-[0_30px_80px_rgb(20_24_38_/_0.18)] sm:px-10 sm:py-12 lg:flex lg:items-end lg:justify-between lg:gap-10">
-              <div className="max-w-2xl">
-                <p className="eyebrow mb-4 text-white before:bg-[rgba(255,255,255,0.5)]">Subscribe</p>
-                <h2 className="headline-balance text-4xl font-semibold text-white sm:text-5xl">
-                  Join your neighbors before the next issue lands.
+            <div className="overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#201e36_0%,#1d2440_45%,#6f5731_150%)] px-6 py-10 text-white shadow-[0_30px_80px_rgb(20_24_38_/_0.18)] sm:px-10 sm:py-12 lg:flex lg:items-center lg:justify-between lg:gap-10">
+              <div className="max-w-xl">
+                <h2 className="headline-balance text-3xl font-semibold text-white sm:text-4xl">
+                  Know what&apos;s happening in Spalding County.
                 </h2>
-                <p className="mt-4 max-w-xl text-lg text-white/76">
-                  A free weekly briefing on the stories worth knowing around Spalding County.
-                </p>
+                <p className="mt-3 text-lg text-white/75">Join your neighbors. It&apos;s free.</p>
               </div>
               <div className="mt-8 w-full max-w-xl lg:mt-0">
                 <SubscribeForm variant="hero" />

@@ -132,6 +132,7 @@ export function SubscribeForm({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
+              aria-label="Email address"
               className="input-field flex-1"
               disabled={status === "loading"}
             />
@@ -139,14 +140,11 @@ export function SubscribeForm({
               {status === "loading" ? "Subscribing..." : "Subscribe Free"}
             </button>
           </div>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-semibold text-ink-deep">{SITE_CONFIG.newsletter.deliveryPromise}</p>
-            {status === "error" ? (
-              <p className="text-sm text-red-700">{message}</p>
-            ) : (
-              <p className="text-sm font-medium text-slate-deep">{SITE_CONFIG.newsletter.heroAudience}</p>
-            )}
-          </div>
+          {status === "error" ? (
+            <p className="mt-3 text-sm text-red-700">{message}</p>
+          ) : (
+            <p className="mt-3 text-sm font-medium text-slate-deep">{SITE_CONFIG.newsletter.deliveryPromise}</p>
+          )}
         </div>
       </form>
     );
@@ -160,7 +158,7 @@ export function SubscribeForm({
           Stay ahead of the next local headline.
         </h3>
         <p className="mb-5 max-w-lg text-slate">
-          Get the {SITE_CONFIG.name} in your inbox each week with community reporting, local events, and the stories neighbors actually talk about.
+          Local news and events from around Spalding County, twice a week.
         </p>
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
@@ -168,6 +166,7 @@ export function SubscribeForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
+            aria-label="Email address"
             className="input-field"
             disabled={status === "loading"}
           />
@@ -191,6 +190,7 @@ export function SubscribeForm({
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Enter your email"
+        aria-label="Email address"
         className="input-field flex-1"
         disabled={status === "loading"}
       />

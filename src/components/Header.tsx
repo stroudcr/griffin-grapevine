@@ -7,7 +7,7 @@ import { Logo } from "./Logo";
 import { SITE_CONFIG } from "@/lib/seo/constants";
 
 const navItems = [
-  { label: "Home", href: "/" },
+  { label: "Events", href: "/spalding-county-events" },
   { label: "Archive", href: "/issues" },
   { label: "About", href: "/about" },
   { label: "Advertise", href: "/advertise" },
@@ -87,13 +87,6 @@ export function Header() {
         }`}
       >
         <div className="page-frame py-5">
-          <div className="mb-4 rounded-[1.75rem] border border-[rgb(29_36_64_/_0.1)] bg-white/80 p-5 shadow-[0_20px_45px_rgb(20_24_38_/_0.08)]">
-            <p className="eyebrow mb-4">This Week</p>
-            <p className="copy-balance text-lg font-medium text-ink">
-              Clear, local reporting from {SITE_CONFIG.phrases.shortCoverage}.
-            </p>
-          </div>
-
           <nav className="flex flex-col gap-2">
             {navItems.map((item) => {
               const active = isActive(pathname, item.href);

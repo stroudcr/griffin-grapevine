@@ -15,6 +15,7 @@ export const SITE_CONFIG = {
     country: "US",
     latitude: 33.2468,
     longitude: -84.2641,
+    timeZone: "America/New_York",
   },
 
   // Cities served within Spalding County
@@ -49,8 +50,7 @@ export const SITE_CONFIG = {
 
   newsletter: {
     successMessage: "Welcome to the Griffin Grapevine!",
-    heroAudience: "Join your neighbors in inboxes across Spalding County.",
-    deliveryPromise: "Weekly delivery. Local reporting. Always free.",
+    deliveryPromise: "Twice a week. Always free.",
     signupContentName: "griffin_grapevine_newsletter",
   },
 
@@ -60,7 +60,7 @@ export const SITE_CONFIG = {
     cityList: "Griffin, Orchard Hill, and Sunny Side",
     shortCoverage: "Griffin and communities across Spalding County",
     communityDescription:
-      "Trusted local reporting for Spalding County, with a calmer inbox rhythm and a closer read on the stories shaping daily life in Griffin, Orchard Hill, Sunny Side, and nearby communities.",
+      "Local news, events, and public meetings for Griffin, Orchard Hill, and Sunny Side.",
   },
 };
 

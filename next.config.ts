@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
     root: process.cwd(),
   },
 
+  async redirects() {
+    return [
+      { source: "/griffin-ga-news", destination: "/issues", permanent: true },
+      { source: "/local-government", destination: "/spalding-county-events", permanent: true },
+    ];
+  },
+
   images: {
     remotePatterns: [
       {
