@@ -11,6 +11,7 @@ const navItems = [
   { label: "Archive", href: "/issues" },
   { label: "About", href: "/about" },
   { label: "Advertise", href: "/advertise" },
+  { label: "Shop", href: "https://shop.griffingrapevine.com/" },
   { label: "Contact", href: "/contact" },
 ];
 
