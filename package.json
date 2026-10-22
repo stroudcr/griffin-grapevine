@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/check-node-version.cjs && next build",
     "start": "next start",
     "lint": "eslint",
     "generate:og": "node scripts/generate-og-image.js",
@@ -38,5 +38,8 @@
   "optionalDependencies": {
     "@tailwindcss/oxide-darwin-arm64": "^4.1.18",
     "lightningcss-darwin-arm64": "^1.30.2"
+  },
+  "engines": {
+    "node": ">=24.22.1 <25"
   }
 }
