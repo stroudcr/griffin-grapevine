@@ -47,6 +47,7 @@ export function Footer() {
               <div className="flex flex-col gap-3 text-sm text-white/78">
                 <Link href="/" className="hover:text-white">Home</Link>
                 <Link href="/spalding-county-events" className="hover:text-white">Events</Link>
+                <Link href="/directory" className="hover:text-white">Local Business Guide</Link>
                 <Link href="/issues" className="hover:text-white">Archive</Link>
                 <Link href="/about" className="hover:text-white">About</Link>
                 <Link href="/advertise" className="hover:text-white">Advertise</Link>
@@ -61,6 +62,8 @@ export function Footer() {
               <div className="flex flex-col gap-3 text-sm text-white/78">
                 <Link href="/privacy" className="hover:text-white">Privacy Policy</Link>
                 <Link href="/terms" className="hover:text-white">Terms of Service</Link>
+                <Link href="/directory/join" className="hover:text-white">List your business</Link>
+                <Link href="/directory/manage" className="hover:text-white">Business owner login</Link>
               </div>
             </div>
           </div>

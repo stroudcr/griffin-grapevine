@@ -28,6 +28,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "beehiiv-images-production.s3.amazonaws.com",
       },
+      {
+        // Photos business owners upload to their guide listings (Vercel Blob)
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
     ],
     formats: ["image/webp", "image/avif"],
     qualities: [75, 80, 85],

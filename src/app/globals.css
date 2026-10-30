@@ -39,6 +39,9 @@
   --color-accent: var(--sand-400);
   --color-accent-deep: var(--sand-500);
   --color-gold: var(--sand-400);
+  --color-gold-soft: var(--sand-300);
+  /* Darker sand for small text on paper (5.7:1), e.g. guide eyebrows and dates. */
+  --color-gold-ink: #7a5a2e;
   --color-slate: var(--slate-500);
   --color-slate-deep: var(--slate-600);
   --font-sans: var(--font-inter);

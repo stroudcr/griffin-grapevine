@@ -11,8 +11,10 @@
     "test": "tsx --test src/**/*.test.ts"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
     "@tailwindcss/typography": "^0.5.19",
     "@vercel/analytics": "^1.6.1",
+    "@vercel/blob": "^2.8.2",
     "isomorphic-dompurify": "^2.30.0",
     "next": "16.1.0",
     "postcss": "^8.5.15",
@@ -20,7 +22,8 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "sanitize-html": "^2.17.0",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "stripe": "^23.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

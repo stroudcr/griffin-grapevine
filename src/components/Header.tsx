@@ -8,6 +8,7 @@ import { SITE_CONFIG } from "@/lib/seo/constants";
 
 const navItems = [
   { label: "Events", href: "/spalding-county-events" },
+  { label: "Local Businesses", href: "/directory" },
   { label: "About", href: "/about" },
   { label: "Shop", href: "https://shop.griffingrapevine.com/" },
   { label: "Contact", href: "/contact" },
