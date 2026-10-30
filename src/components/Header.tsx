@@ -32,7 +32,7 @@ export function Header() {
         <div className="flex h-20 items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <Logo variant="full" />
-            <div className="hidden border-l border-[rgb(29_36_64_/_0.12)] pl-3 lg:block">
+            <div className="hidden border-l border-[rgb(29_36_64_/_0.12)] pl-3 xl:block">
               <p className="text-[0.67rem] font-semibold uppercase tracking-[0.24em] text-ink-soft">
                 {SITE_CONFIG.editionLabel}
               </p>
@@ -48,7 +48,7 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-full px-3 py-2 text-sm font-medium transition-colors lg:px-4 ${
+                  className={`whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-colors lg:px-4 ${
                     active
                       ? "bg-[rgb(29_36_64_/_0.07)] text-ink"
                       : "text-slate hover:bg-[rgb(29_36_64_/_0.04)] hover:text-ink"

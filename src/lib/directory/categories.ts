@@ -283,7 +283,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     slug: "property-management",
-    name: "Property Management",
+    name: "Property management",
     heading: "Property Management Companies",
     singular: "property management company",
     group: "professional-services",
