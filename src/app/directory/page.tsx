@@ -143,11 +143,11 @@ export default async function DirectoryHomePage() {
             </p>
           )}
 
-          <div className="mx-auto mt-12 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-white/15 pt-5 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-white/70">
+          <div className="mx-auto mt-12 flex max-w-3xl flex-col items-center justify-center gap-x-6 gap-y-2 border-t sm:flex-row sm:flex-wrap border-white/15 pt-5 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-white/70">
             <span>{guideEdition()} edition</span>
-            <span aria-hidden="true" className="text-gold-soft">•</span>
+            <span aria-hidden="true" className="hidden text-gold-soft sm:inline">•</span>
             <span>{SITE_CONFIG.cities.join(" · ")}</span>
-            <span aria-hidden="true" className="text-gold-soft">•</span>
+            <span aria-hidden="true" className="hidden text-gold-soft sm:inline">•</span>
             <span>{businesses.length > 0 ? `${businesses.length} local businesses` : "Now accepting listings"}</span>
           </div>
         </div>
