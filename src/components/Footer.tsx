@@ -33,7 +33,7 @@ export function Footer() {
       <div className="page-frame py-14 sm:py-16">
         <div className="grid gap-10 border-b border-white/10 pb-10 lg:grid-cols-[1.3fr_0.9fr_0.8fr]">
           <div className="max-w-xl">
-            <Logo variant="stacked" className="text-white" />
+            <Logo variant="stacked" theme="dark" />
             <p className="copy-balance mt-5 text-base leading-8 text-white/72">
               {SITE_CONFIG.phrases.communityDescription}
             </p>
