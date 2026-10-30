@@ -5,6 +5,7 @@ import { Footer, Header } from "@/components";
 import { SITE_CONFIG } from "@/lib/seo/constants";
 import { buildPageMetadata } from "@/lib/seo/page-metadata";
 import styles from "./advertise.module.css";
+import { PresentingPartnerExample } from "./PresentingPartnerExample";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Advertise | Reach Spalding County Residents",
@@ -145,7 +146,7 @@ export default function AdvertisePage() {
               <div className={styles.packageCopy}>
                 <p>Become the Presenting Partner of Griffin Grapevine for an entire month.</p>
                 <p>Your business receives premium placement across every Griffin Grapevine issue that month, putting your name in front of Spalding County readers approximately eight times throughout the campaign.</p>
-                <blockquote>&ldquo;Today&apos;s Griffin Grapevine is presented by [Your Business].&rdquo;</blockquote>
+                <PresentingPartnerExample />
                 <p>Your partnership includes prominent branding, custom sponsor messaging, links to your business, category exclusivity, performance reporting, and additional visibility through Griffin Grapevine&apos;s social media.</p>
                 <p className={styles.availability}>There is only one Presenting Partner available per month. When a month is booked, it&apos;s booked.</p>
               </div>
