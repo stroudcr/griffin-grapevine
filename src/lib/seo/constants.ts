@@ -1,6 +1,6 @@
 export const SITE_CONFIG = {
   name: "Griffin Grapevine",
-  tagline: "Local News with Character",
+  tagline: "Rooted in Spalding County",
   editionLabel: "Local Edition",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.griffingrapevine.com",
   email: "griffin@welldiem.com",
