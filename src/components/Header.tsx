@@ -8,9 +8,7 @@ import { SITE_CONFIG } from "@/lib/seo/constants";
 
 const navItems = [
   { label: "Events", href: "/spalding-county-events" },
-  { label: "Archive", href: "/issues" },
   { label: "About", href: "/about" },
-  { label: "Advertise", href: "/advertise" },
   { label: "Shop", href: "https://shop.griffingrapevine.com/" },
   { label: "Contact", href: "/contact" },
 ];
@@ -59,8 +57,8 @@ export function Header() {
                 </Link>
               );
             })}
-            <Link href="/#subscribe" className="btn-primary ml-2 whitespace-nowrap text-sm">
-              Subscribe Free
+            <Link href="/advertise" className="btn-primary ml-2 whitespace-nowrap text-sm">
+              Advertise with Us
             </Link>
           </nav>
 
@@ -107,8 +105,8 @@ export function Header() {
                 </Link>
               );
             })}
-            <Link href="/#subscribe" className="btn-primary mt-2" onClick={() => setMobileMenuOpen(false)}>
-              Subscribe Free
+            <Link href="/advertise" className="btn-primary mt-2" onClick={() => setMobileMenuOpen(false)}>
+              Advertise with Us
             </Link>
           </nav>
         </div>
