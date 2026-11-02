@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { JsonLd, SubscribeForm } from "@/components";
 import { VineRule } from "@/components/VineIcon";
 import { CategoryBrowser, type ListingCard } from "@/components/directory/CategoryBrowser";
+import { GetListed } from "@/components/directory/GetListed";
 import {
   CATEGORIES,
   DIRECTORY_PATH,
@@ -202,7 +203,7 @@ export default async function CategoryPage({ params }: Props) {
                 <Link href="/directory/join" className="mt-3 inline-block text-[15px] font-semibold text-ink">
                   Become a featured member <span aria-hidden="true">→</span>
                 </Link>
-                <Link href={`${DIRECTORY_PATH}#get-listed`} className="mt-1 block text-sm text-slate">
+                <Link href="#get-listed" className="mt-1 block text-sm text-slate">
                   Compare free and featured
                 </Link>
               </div>
@@ -223,6 +224,9 @@ export default async function CategoryPage({ params }: Props) {
           }
         />
       </div>
+
+      {/* ---------- Pricing ---------- */}
+      <GetListed />
     </main>
   );
 }
