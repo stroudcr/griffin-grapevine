@@ -96,8 +96,9 @@ const TOWN_CODES: Record<Town, string> = {
   "Sunny Side": "SSD",
 };
 
-export function townCode(town: Town): string {
-  return TOWN_CODES[town];
+/** Three-letter code for a town, e.g. "GRF". Cities outside the Grapevine's list use their first three letters. */
+export function townCode(town: string): string {
+  return (TOWN_CODES as Record<string, string>)[town] ?? town.replace(/[^\p{L}]/gu, "").slice(0, 3).toUpperCase();
 }
 
 export function capitalize(text: string): string {
@@ -145,19 +146,51 @@ export function mailtoHref(subject: string, body?: string): string {
 
 /* ---------- calls to action ---------- */
 
-// Listings are handled by email for now. Swap these for a form or checkout
-// link when one exists.
 const LISTING_DETAILS = "Business name:\nCategory:\nAddress:\nPhone:\nWebsite:\n";
 
-export const FREE_LISTING_MAILTO = mailtoHref(`Free listing in the ${GUIDE_NAME}`, LISTING_DETAILS);
+export const FREE_LISTING_HREF = "/directory/submit";
 
 export const FEATURED_MAILTO = mailtoHref(
   `Featured membership in the ${GUIDE_NAME}`,
   `${LISTING_DETAILS}Monthly or yearly:\n`
 );
 
-export function claimMailto(businessName: string): string {
-  return mailtoHref(`Claim my listing: ${businessName}`, "Your name:\nYour role at the business:\nBest phone number:\n");
+export function claimHref(businessSlug: string): string {
+  return `${FREE_LISTING_HREF}?claim=${encodeURIComponent(businessSlug)}`;
+}
+
+/* ---------- free → featured upgrade ---------- */
+
+export const JOIN_PATH = "/directory/join";
+
+/** A yearly price as a daily one, e.g. 190 → "about 52¢ a day". */
+export function perDayLabel(yearlyDollars: number): string {
+  const cents = Math.round((yearlyDollars / 365) * 100);
+  return cents < 100 ? `about ${cents}¢ a day` : `about $${(cents / 100).toFixed(2)} a day`;
+}
+
+/** Public business details the featured signup can be pre-filled with. Never the owner's email. */
+export const UPGRADE_FIELDS = ["name", "category", "street", "suite", "city", "zip", "phone", "website"] as const;
+export type UpgradeDetails = Partial<Record<(typeof UPGRADE_FIELDS)[number], string>>;
+
+/** Link to the featured signup, pre-filled with a free listing's details. */
+export function upgradeHref(details: UpgradeDetails): string {
+  const params = new URLSearchParams({ plan: "yearly", from: "free" });
+  for (const key of UPGRADE_FIELDS) {
+    const value = details[key]?.trim();
+    if (value) params.set(key, value.slice(0, 200));
+  }
+  return `${JOIN_PATH}?${params}`;
+}
+
+/** Reads pre-fill details back out of the join page's query string. */
+export function upgradeDetailsFrom(query: Record<string, string | string[] | undefined>): UpgradeDetails {
+  const details: UpgradeDetails = {};
+  for (const key of UPGRADE_FIELDS) {
+    const value = query[key];
+    if (typeof value === "string" && value.trim()) details[key] = value.trim().slice(0, 200);
+  }
+  return details;
 }
 
 export function updateMailto(businessName: string): string {

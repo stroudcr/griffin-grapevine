@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CheckIcon } from "@/components/directory/icons";
-import { FREE_LISTING_MAILTO, GUIDE_NAME, PRICING } from "@/lib/directory";
+import { FREE_LISTING_HREF, GUIDE_NAME, PRICING } from "@/lib/directory";
 
 const FREE_FEATURES = ["Name, address, phone and hours", "Listed in your category", "Link to your website"];
 const FEATURED_FEATURES = [
@@ -8,7 +8,6 @@ const FEATURED_FEATURES = [
   "Full profile with photos and description",
   "Top placement in your category",
   "A Grapevine Perk offer for readers",
-  "Spotlight in the Grapevine newsletter",
   "Monthly report of views, calls and clicks",
 ];
 
@@ -26,7 +25,7 @@ export function GetListed() {
             Get your business in the {GUIDE_NAME}
           </h2>
           <p className="copy-balance mx-auto mt-4 max-w-[580px] text-[17px] leading-7 text-slate">
-            Every Spalding County business can have a free listing. Featured members get a full profile, top placement and a spot in the newsletter.
+            Every Spalding County business can have a free listing. Featured members get a full profile with photos, top placement in their category and a Grapevine Perk for readers.
           </p>
         </div>
 
@@ -43,9 +42,9 @@ export function GetListed() {
                 </li>
               ))}
             </ul>
-            <a href={FREE_LISTING_MAILTO} className="btn-secondary mt-8 w-full">
+            <Link href={FREE_LISTING_HREF} className="btn-secondary mt-8 w-full">
               Claim your free listing
-            </a>
+            </Link>
           </div>
 
           <div className="page-shell-dark relative min-w-0 flex-[1_1_340px] rounded-[1.75rem] p-8 text-white shadow-[0_34px_70px_-34px_rgba(20,24,38,0.7)]">

@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { VineRule } from "@/components/VineIcon";
 import { CheckIcon } from "@/components/directory/icons";
-import { CATEGORY_GROUPS, DIRECTORY_PATH, GUIDE_NAME, PRICING, categoriesInGroup } from "@/lib/directory";
+import { CATEGORY_GROUPS, DIRECTORY_PATH, FREE_LISTING_HREF, GUIDE_NAME, PRICING, categoriesInGroup, upgradeDetailsFrom } from "@/lib/directory";
 import { guideMetadata } from "@/lib/directory/metadata";
 import { SITE_CONFIG } from "@/lib/seo/constants";
 import { JoinForm } from "./JoinForm";
 
 export const metadata = guideMetadata({
   title: `Become a Featured Member | ${GUIDE_NAME} | ${SITE_CONFIG.name}`,
-  description: `Put your Spalding County business in front of Griffin Grapevine readers: a full profile with photos, top placement in your category and a newsletter spotlight, for $${PRICING.monthly} a month or $${PRICING.yearly} a year.`,
+  description: `Put your Spalding County business in front of Griffin Grapevine readers: a full profile with photos, top placement in your category and a Grapevine Perk for readers, for $${PRICING.monthly} a month or $${PRICING.yearly} a year.`,
   path: "/directory/join",
 });
 
@@ -16,17 +16,20 @@ const INCLUDED = [
   "A full profile with photos, hours and a description",
   "Top placement in your category",
   "A Grapevine Perk offer shown to readers",
-  "A spotlight in the Grapevine newsletter",
   "A monthly report of views, calls and clicks",
   "Edit your listing yourself, anytime",
 ];
 
 interface Props {
-  searchParams: Promise<{ plan?: string; canceled?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default async function JoinPage({ searchParams }: Props) {
-  const { plan, canceled } = await searchParams;
+  const query = await searchParams;
+  const { plan, canceled, from } = query;
+  // Coming from a free listing: its public details are carried over so the owner only adds an email and plan.
+  const carriedOver = from === "free" ? upgradeDetailsFrom(query) : {};
+  const hasCarriedOver = Object.keys(carriedOver).length > 0;
   const categoryGroups = CATEGORY_GROUPS.map((group) => ({
     name: group.name,
     options: categoriesInGroup(group.slug).map((c) => ({ value: c.slug, label: c.heading })),
@@ -59,9 +62,14 @@ export default async function JoinPage({ searchParams }: Props) {
               Checkout was canceled and you weren&apos;t charged. Your details are below if you&apos;d like to try again.
             </p>
           )}
+          {hasCarriedOver && !canceled && (
+            <p className="mb-6 rounded-2xl border border-gold/50 bg-paper px-4 py-3 text-[15px] text-slate-deep">
+              We&apos;ve filled in your business details from your free listing. Check them, add your email and choose a plan.
+            </p>
+          )}
           <JoinForm
             categoryGroups={categoryGroups}
-            towns={[...SITE_CONFIG.cities]}
+            initialValues={carriedOver}
             defaultPlan={plan === "yearly" ? "yearly" : "monthly"}
             pricing={{ monthly: PRICING.monthly, yearly: PRICING.yearly, savings: PRICING.yearlySavings }}
           />
@@ -88,7 +96,7 @@ export default async function JoinPage({ searchParams }: Props) {
           </div>
           <p className="mt-4 px-2 text-sm leading-6 text-slate">
             Just want a basic listing? It&apos;s free:{" "}
-            <Link href={`${DIRECTORY_PATH}#get-listed`} className="font-semibold text-ink">
+            <Link href={FREE_LISTING_HREF} className="font-semibold text-ink">
               see the free option
             </Link>
             . Already a member?{" "}

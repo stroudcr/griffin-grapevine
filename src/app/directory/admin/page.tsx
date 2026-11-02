@@ -6,6 +6,8 @@ import { SITE_CONFIG } from "@/lib/seo/constants";
 import { isPublic, type ListingRow } from "@/lib/guide/content";
 import { hasDatabase } from "@/lib/guide/env";
 import { allListingsForAdmin } from "@/lib/guide/listings";
+import { freeSubmissions } from "@/lib/guide/free-listings";
+import { FreeSubmissions } from "./FreeSubmissions";
 import { getSession } from "@/lib/guide/session";
 import { TONE_CLASSES, describeStatus, formatDate } from "@/lib/guide/status";
 import { approveListing, hideListing, rejectListing, sendOwnerSignInLink } from "./actions";
@@ -105,12 +107,12 @@ export default async function AdminPage({ searchParams }: Props) {
   if (!hasDatabase()) {
     return (
       <main className="flex-1">
-        <p className="mx-auto max-w-2xl px-4 py-20 text-lg text-slate">Connect a database to start taking paid listings.</p>
+        <p className="mx-auto max-w-2xl px-4 py-20 text-lg text-slate">Connect a database to start taking listings.</p>
       </main>
     );
   }
 
-  const listings = await allListingsForAdmin();
+  const [listings, freeListings] = await Promise.all([allListingsForAdmin(), freeSubmissions()]);
   const pending = listings.filter((l) => l.status === "pending");
   const others = listings.filter((l) => l.status !== "pending");
 
@@ -119,7 +121,7 @@ export default async function AdminPage({ searchParams }: Props) {
       <div className="mx-auto max-w-6xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
         <div className="border-t border-navy/[0.12] pt-6">
           <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-gold-ink">Local Business Guide</span>
-          <h1 className="mt-2 text-[clamp(2.2rem,5vw,3.2rem)] font-semibold leading-tight text-ink">Featured listings</h1>
+          <h1 className="mt-2 text-[clamp(2.2rem,5vw,3.2rem)] font-semibold leading-tight text-ink">Review business listings</h1>
           <p className="mt-1 text-sm text-slate">
             Signed in as {session.email} ·{" "}
             <Link href="/directory/manage" className="font-medium">
@@ -134,9 +136,10 @@ export default async function AdminPage({ searchParams }: Props) {
           </p>
         )}
 
+        <FreeSubmissions listings={freeListings} />
         <section className="mt-10">
           <h2 className="font-serif text-3xl font-semibold text-ink">
-            Waiting for review <span className="tabular-nums text-xl text-slate">({pending.length})</span>
+            Featured listings to review <span className="tabular-nums text-xl text-slate">({pending.length})</span>
           </h2>
           {pending.length === 0 ? (
             <p className="mt-3 text-slate">Nothing to review right now.</p>

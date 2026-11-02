@@ -3,8 +3,7 @@ import assert from "node:assert/strict";
 import { BUSINESSES } from "./businesses";
 import { CATEGORIES, CATEGORY_GROUPS } from "./categories";
 import { TAGS } from "./tags";
-import { SITE_CONFIG } from "@/lib/seo/constants";
-import { DAY_ORDER, formatTime, guideEdition, sortBusinesses, telHref } from "./index";
+import { DAY_ORDER, PRICING, formatTime, guideEdition, perDayLabel, sortBusinesses, telHref, upgradeDetailsFrom, upgradeHref } from "./index";
 import type { Business } from "./types";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -41,7 +40,7 @@ test("business entries are valid", () => {
     seen.add(b.slug);
 
     assert.ok(categorySlugs.has(b.category), `${label}: unknown category ${b.category}`);
-    assert.ok(SITE_CONFIG.cities.includes(b.town), `${label}: unknown town ${b.town}`);
+    assert.ok(b.town.trim().length >= 2, `${label}: missing town`);
     assert.match(b.addedAt, DATE, `${label}: addedAt must be YYYY-MM-DD`);
     if (b.verifiedAt) assert.match(b.verifiedAt, DATE, `${label}: verifiedAt must be YYYY-MM-DD`);
     if (b.website) assert.match(b.website, /^https?:\/\//, `${label}: website needs https://`);
@@ -83,4 +82,22 @@ test("formatting helpers", () => {
   assert.equal(telHref("1-770-555-0142"), "tel:+17705550142");
   assert.equal(guideEdition(new Date("2026-10-24T12:00:00Z")), "Fall 2026");
   assert.equal(guideEdition(new Date("2027-01-10T12:00:00Z")), "Winter 2027");
+});
+
+test("featured price is shown per day", () => {
+  assert.equal(perDayLabel(PRICING.yearly), "about 52¢ a day");
+  assert.equal(perDayLabel(PRICING.monthly * 12), "about 62¢ a day");
+  assert.equal(perDayLabel(400), "about $1.10 a day");
+});
+
+test("upgrade link carries public business details to the featured signup, never email", () => {
+  const href = upgradeHref({ name: "Joe's Plumbing & Heating", category: "plumbers", street: "1 Main St", suite: "", city: "Orchard Hill", zip: "30266", phone: "(770) 555-1234", website: "https://example.com" });
+  const url = new URL(href, "https://www.griffingrapevine.com");
+  assert.equal(url.pathname, "/directory/join");
+  assert.equal(url.searchParams.get("plan"), "yearly");
+  assert.equal(url.searchParams.get("from"), "free");
+  assert.equal(url.searchParams.has("suite"), false);
+  assert.equal(url.searchParams.has("email"), false);
+  const details = upgradeDetailsFrom({ ...Object.fromEntries(url.searchParams), email: "owner@example.com" });
+  assert.deepEqual(details, { name: "Joe's Plumbing & Heating", category: "plumbers", street: "1 Main St", city: "Orchard Hill", zip: "30266", phone: "(770) 555-1234", website: "https://example.com" });
 });

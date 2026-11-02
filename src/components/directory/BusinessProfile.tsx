@@ -14,7 +14,7 @@ import {
   businessHref,
   capitalize,
   categoryHref,
-  claimMailto,
+  claimHref,
   directionsUrl,
   displayHost,
   formatIntervals,
@@ -227,9 +227,9 @@ export function BusinessProfile({ business, category, others, manage, banner, tr
               <div className="rounded-[1.75rem] border border-dashed border-navy/30 bg-white/70 p-7">
                 <p className="font-serif text-2xl font-semibold text-ink">Is this your business?</p>
                 <p className="mt-2 max-w-[56ch] leading-7 text-slate">
-                  This is a free listing. Claim it to add a description, photos, hours and a Grapevine Perk for readers.
+                  This is a free listing. Claim it to send us your business details and hours for approval.
                 </p>
-                <a href={claimMailto(business.name)} className="btn-primary mt-5 !text-white">
+                <a href={claimHref(business.slug)} className="btn-primary mt-5 !text-white">
                   Claim this listing
                 </a>
               </div>
