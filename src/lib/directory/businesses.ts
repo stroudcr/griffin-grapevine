@@ -58,7 +58,7 @@ const LAUNCH = "2026-10-30";
 const VERIFIED = "2026-11-01";
 
 export const BUSINESSES: Business[] = [
-  /* Added 2026-11-01. The first six here lead "Recently added". */
+  /* ---------------- Added 2026-11-01 ---------------- */
   {
     // Sources: https://smallcakesgriffingeorgia.com/ (menu, hours, ordering).
     slug: "smallcakes-griffin",
