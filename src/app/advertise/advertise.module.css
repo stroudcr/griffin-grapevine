@@ -109,7 +109,7 @@
   border-radius: 16px;
 }
 .featuredPackage + .featuredPackage { margin-top: 28px; }
-.spotlight { border-top: 3px solid var(--sand-400); background: white; }
+.guidePackage { border-top: 3px solid var(--sand-400); background: white; }
 .packageSummary .eyebrow { margin-bottom: 24px; }
 .page h3 { color: var(--ink-900); font-size: 34px; font-weight: 600; line-height: 1.1; text-wrap: balance; }
 .price {
@@ -154,6 +154,85 @@
 .buttonGold { background: #c3a976; color: var(--ink-950); }
 .buttonGold:hover { background: #d1ba8f; }
 .availability { color: var(--stone-50); font-weight: 500; }
+/* Presenting Partner packages: a full-width row under the title, highest
+   price first. They stay side by side on every screen size, because stacking
+   them top to bottom would flip the high-to-low reading order. */
+.tiered {
+  grid-template-areas: "summary summary" "tiers tiers" "aside details";
+  row-gap: 28px;
+}
+.tiered .packageSummary { grid-area: summary; padding-top: 0; }
+.presenting .packageSummary > .tieredLead {
+  margin-top: 14px;
+  color: var(--stone-50);
+  font-family: var(--font-source-serif), Georgia, serif;
+  font-size: 25px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+.tieredLead + p { margin-top: 10px; color: #c8ccd8; }
+.tiers { grid-area: tiers; }
+.tiered .packageDetails { grid-area: details; }
+.tierAside { grid-area: aside; }
+.tierAside .includes { margin-top: 0; }
+.tierAside .button { margin-top: 28px; }
+.tierList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.tier {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 24px 22px;
+  border: 1px solid rgb(195 169 118 / 0.35);
+  border-radius: 12px;
+}
+.recommendedTier { border-color: #c3a976; background: rgb(255 255 255 / 0.05); }
+.tierTag {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  transform: translateY(-50%);
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #c3a976;
+  color: var(--ink-950);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+.page .tierCount {
+  margin: 0;
+  color: var(--sand-300);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.tierPrice {
+  margin: 12px 0 0;
+  color: var(--stone-50);
+  font-family: var(--font-source-serif), Georgia, serif;
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+.tierEach { margin: 8px 0 0; color: #c8ccd8; font-size: 14px; line-height: 1.5; }
+.tierDetails {
+  margin: 16px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid rgb(195 169 118 / 0.35);
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.tierDetails li + li { margin-top: 6px; }
+.tierNote { margin-top: 16px; color: #c8ccd8; font-size: 14px; line-height: 1.6; }
+/* Local Business Guide: its own section below the newsletter options. */
+.guideSection { padding-top: 72px; scroll-margin-top: 110px; }
+.inlineLink { color: var(--ink-900); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 /* Presenting Partner example: the top of a real issue, set the way it reads
    in the inbox (Helvetica, Beehiiv's dashed dividers), with the sponsor's
    placements marked in Grapevine gold. */
@@ -295,6 +374,17 @@
   .calloutTag { left: 8px; max-width: calc(100% - 16px); }
   .issueLogo { width: 64%; }
   .issueSheet .issueSection { font-size: 17px; }
+  .tiered { grid-template-areas: "summary" "tiers" "details" "aside"; row-gap: 24px; }
+  .tierAside { padding-top: 24px; border-top: 1px solid rgb(195 169 118 / 0.4); }
+  .presenting .packageSummary > .tieredLead { font-size: 22px; }
+  .tierList { gap: 8px; }
+  .tier { padding: 22px 8px 14px; border-radius: 10px; }
+  .tierTag { left: 50%; transform: translate(-50%, -50%); padding: 2px 7px; font-size: 10.5px; }
+  .page .tierCount { font-size: 10.5px; letter-spacing: 0.04em; }
+  .tierPrice { margin-top: 8px; font-size: 30px; letter-spacing: -0.03em; }
+  .tierEach { margin-top: 6px; font-size: 12px; line-height: 1.4; }
+  .tierDetails { margin-top: 12px; padding-top: 10px; font-size: 12px; line-height: 1.4; }
+  .guideSection { padding-top: 48px; }
 }
 
 @media (max-width: 420px) {
@@ -304,6 +394,11 @@
   .price { font-size: 62px; }
   .pricePeriod { font-size: 23px; }
   .contact .button { padding-inline: 14px; font-size: 13px; }
+}
+
+@media (max-width: 380px) {
+  .tier { padding-inline: 6px; }
+  .tierPrice { font-size: 26px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { Footer, Header } from "@/components";
 import { SITE_CONFIG } from "@/lib/seo/constants";
@@ -10,9 +11,17 @@ import { PresentingPartnerExample } from "./PresentingPartnerExample";
 export const metadata: Metadata = buildPageMetadata({
   title: "Advertise | Reach Spalding County Residents",
   description:
-    "Put your business in front of Spalding County locals. Explore Griffin Grapevine advertising: Local Business Spotlight $360/month, Presenting Partner $500/month, Section Partner $200/month, and Sponsored Event Feature $50.",
+    "Put your business in front of Spalding County locals. Explore Griffin Grapevine advertising: Presenting Partner from $160, Section Partner $200/month, Featured Event $50, and Local Business Guide membership from $19/month.",
   path: "/advertise",
 });
+
+// Presenting Partner packages, shown highest first. Every package gets the
+// same placement; they differ only in how many issues they run in.
+const presentingPartnerTiers = [
+  { features: 8, price: 500, perFeature: "$62.50", schedule: "8 issues in a row, about a month", instagram: true, recommended: false },
+  { features: 4, price: 280, perFeature: "$70", schedule: "4 issues in a row: Mon, Fri, Mon, Fri", instagram: true, recommended: true },
+  { features: 2, price: 160, perFeature: "$80", schedule: "2 issues", instagram: false, recommended: false },
+];
 
 function Arrow() {
   return (
@@ -42,10 +51,10 @@ function Price({ amount, oneTime = false }: { amount: number; oneTime?: boolean 
   );
 }
 
-function Includes({ items, columns = false }: { items: string[]; columns?: boolean }) {
+function Includes({ items, columns = false, heading = "Includes" }: { items: string[]; columns?: boolean; heading?: string }) {
   return (
     <div className={styles.includes}>
-      <h4 className={styles.includesHeading}>Includes</h4>
+      <h4 className={styles.includesHeading}>{heading}</h4>
       <ul className={`${styles.featureList} ${columns ? styles.featureColumns : ""}`}>
         {items.map((item) => (
           <li key={item}>
@@ -56,6 +65,28 @@ function Includes({ items, columns = false }: { items: string[]; columns?: boole
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+function PresentingPartnerTiers() {
+  return (
+    <div className={styles.tiers}>
+      <ul className={styles.tierList} aria-label="Presenting Partner packages">
+        {presentingPartnerTiers.map((tier) => (
+          <li key={tier.features} className={`${styles.tier} ${tier.recommended ? styles.recommendedTier : ""}`}>
+            {tier.recommended && <span className={styles.tierTag}>Recommended</span>}
+            <h4 className={styles.tierCount}>{tier.features} features</h4>
+            <p className={styles.tierPrice}>${tier.price}</p>
+            <p className={styles.tierEach}>{tier.perFeature} per feature</p>
+            <ul className={styles.tierDetails}>
+              <li>{tier.schedule}</li>
+              {tier.instagram && <li>Instagram exposure</li>}
+            </ul>
+          </li>
+        ))}
+      </ul>
+      <p className={styles.tierNote}>Four issues in a row is the run we&apos;ve seen perform best.</p>
     </div>
   );
 }
@@ -113,48 +144,27 @@ export default function AdvertisePage() {
             <h2 id="options-heading">2027 Advertising Options</h2>
             <p>We keep advertising intentionally limited. Griffin Grapevine isn&apos;t built around filling every available inch with ads, and we think that&apos;s better for both our readers and our advertisers.</p>
           </div>
-          <article className={`${styles.featuredPackage} ${styles.spotlight}`} aria-labelledby="spotlight-heading">
-            <div className={styles.packageSummary}>
-              <p className={styles.eyebrow}>Our most popular option</p>
-              <h3 id="spotlight-heading">Local Business Spotlight</h3>
-              <Price amount={360} />
-              <p>Our most popular option, and where we&apos;d recommend most Griffin-area businesses start.</p>
-              <InquiryLink subject="Local Business Spotlight">Ask about the Spotlight</InquiryLink>
-            </div>
-            <div className={styles.packageDetails}>
-              <div className={styles.packageCopy}>
-                <p>Your business gets four native advertising features over a four-week campaign, giving you repeated exposure without showing up so often that readers tune you out.</p>
-                <p>Each placement is written or refined in the Griffin Grapevine voice and can include your photo or logo, a direct link, and a clear call to action.</p>
-                <p>Your campaign also includes category exclusivity. While your Spotlight campaign is active, we won&apos;t run another Local Business Spotlight from a direct competitor in your category.</p>
-                <p>You&apos;ll receive a performance recap after your campaign.</p>
-              </div>
-              <Includes columns items={[
-                "4 Griffin Grapevine placements", "Custom-written or edited copy", "Photo or logo",
-                "Direct link and call to action", "Category exclusivity", "Campaign performance recap",
-              ]} />
-            </div>
-          </article>
-
-          <article className={`${styles.featuredPackage} ${styles.presenting}`} aria-labelledby="presenting-heading">
+          <article className={`${styles.featuredPackage} ${styles.presenting} ${styles.tiered}`} aria-labelledby="presenting-heading">
             <div className={styles.packageSummary}>
               <h3 id="presenting-heading">Presenting Partner</h3>
-              <Price amount={500} />
-              <p>The biggest presence we offer.</p>
-              <InquiryLink subject="Presenting Partner" light>Ask about a partnership</InquiryLink>
+              <p className={styles.tieredLead}>The biggest presence we offer.</p>
+              <p>Choose how many issues you want.</p>
             </div>
+            <PresentingPartnerTiers />
             <div className={styles.packageDetails}>
               <div className={styles.packageCopy}>
-                <p>Become the Presenting Partner of Griffin Grapevine for an entire month.</p>
-                <p>Your business receives premium placement across every Griffin Grapevine issue that month, putting your name in front of Spalding County readers approximately eight times throughout the campaign.</p>
+                <p>Every feature puts your logo at the top of the issue and your message right after the morning note, the first thing Spalding County readers see when they open the Grapevine.</p>
                 <PresentingPartnerExample />
-                <p>Your partnership includes prominent branding, custom sponsor messaging, links to your business, category exclusivity, performance reporting, and additional visibility through Griffin Grapevine&apos;s social media.</p>
-                <p className={styles.availability}>There is only one Presenting Partner available per month. When a month is booked, it&apos;s booked.</p>
+                <p className={styles.availability}>There&apos;s one Presenting Partner spot per issue, about 8 a month. When they&apos;re booked, they&apos;re booked.</p>
               </div>
-              <Includes columns items={[
-                "Placement in every issue that month", "Approximately 8 newsletter appearances",
-                "Premium top-of-publication positioning", "Custom sponsor messaging", "Logo/photo and links",
-                "Category exclusivity", "Instagram exposure", "Monthly performance recap",
+            </div>
+            <div className={styles.tierAside}>
+              <Includes heading="Every feature includes" items={[
+                "Your logo at the top of the issue", "Your sponsor message right after the morning note",
+                "Custom-written or edited copy", "Photo or logo and direct links to your business",
+                "Category exclusivity: no direct competitor in the same issue", "Campaign performance recap",
               ]} />
+              <InquiryLink subject="Presenting Partner" light>Ask about a partnership</InquiryLink>
             </div>
           </article>
 
@@ -182,22 +192,48 @@ export default function AdvertisePage() {
               </div>
             </article>
             <article className={styles.secondaryPackage} aria-labelledby="event-heading">
-              <h3 id="event-heading">Sponsored Event Feature</h3>
+              <h3 id="event-heading">Featured Event</h3>
               <Price amount={50} oneTime />
               <p className={styles.packageLead}>Have something happening that Spalding County should know about?</p>
               <div className={styles.packageCopy}>
                 <p>This option is designed for grand openings, community events, open houses, special promotions, anniversary celebrations, fundraisers, and other time-sensitive happenings around Griffin and Spalding County.</p>
-                <p>We&apos;ll create an editorial-style sponsored feature with your photo, event information, and a direct link, then place it in a Griffin Grapevine issue ahead of your event or promotion.</p>
+                <p>Your event goes first in WHAT&apos;S HAPPENIN&apos;, the Grapevine&apos;s local events section, with your event graphic, in an issue ahead of your event.</p>
                 <p>No monthly commitment required.</p>
               </div>
               <Includes items={[
-                "One sponsored feature", "Custom-written or edited copy", "Photo", "Direct link", "Prominent placement in one issue",
+                "Your event graphic", "Top spot in WHAT'S HAPPENIN'", "Link to your event details", "One issue ahead of your event",
               ]} />
               <div className={styles.secondaryAction}>
-                <InquiryLink subject="Sponsored Event Feature">Tell us about your event</InquiryLink>
+                <InquiryLink subject="Featured Event">Tell us about your event</InquiryLink>
               </div>
             </article>
           </div>
+        </section>
+
+        <section id="local-business-guide" className={`page-frame ${styles.guideSection}`} aria-labelledby="guide-heading">
+          <div className={styles.sectionIntro}>
+            <h2 id="guide-heading">Get your business in the Local Business Guide</h2>
+            <p>The Local Business Guide is Griffin Grapevine&apos;s directory of businesses across Griffin and Spalding County.</p>
+          </div>
+          <article className={`${styles.featuredPackage} ${styles.guidePackage}`} aria-labelledby="guide-member-heading">
+            <div className={styles.packageSummary}>
+              <p className={styles.eyebrow}>Local Business Guide</p>
+              <h3 id="guide-member-heading">Featured member</h3>
+              <Price amount={19} />
+              <p>or $190 a year (save $38)</p>
+              <Link href="/directory/join" className={styles.button}>Become a featured member <Arrow /></Link>
+            </div>
+            <div className={styles.packageDetails}>
+              <div className={styles.packageCopy}>
+                <p>Guide membership is separate from newsletter advertising and doesn&apos;t include placement in the Grapevine itself.</p>
+                <p>Not ready for a featured profile? Every Spalding County business can <Link href="/directory/submit" className={styles.inlineLink}>claim a free listing</Link>.</p>
+              </div>
+              <Includes columns items={[
+                "A full profile with photos and a description", "Top placement in your category",
+                "A Grapevine Perk offer for readers", "A monthly report of views, calls, and clicks",
+              ]} />
+            </div>
+          </article>
         </section>
 
         <section id="lets-talk" className={`page-frame ${styles.contact}`} aria-labelledby="contact-heading">
