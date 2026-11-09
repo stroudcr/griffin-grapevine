@@ -14,6 +14,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
   { slug: "pets", name: "Pets" },
   { slug: "professional-services", name: "Professional Services" },
   { slug: "creative-media", name: "Creative & Media" },
+  { slug: "sports-recreation", name: "Sports & Recreation" },
 ];
 
 export const CATEGORIES: Category[] = [
@@ -353,5 +354,27 @@ export const CATEGORIES: Category[] = [
     schemaType: "ProfessionalService",
     blurb: "small business websites, redesigns, SEO and ongoing site updates",
     keywords: ["website", "web designer", "web developer", "website design", "seo", "ecommerce", "hosting"],
+  },
+
+  // Sports & Recreation
+  {
+    slug: "golf",
+    name: "Golf",
+    heading: "Golf Lessons, Shops & Courses",
+    singular: "golf business",
+    group: "sports-recreation",
+    schemaType: "SportsActivityLocation",
+    blurb: "golf lessons, club fitting and repair, custom clubs, pro shops and courses",
+    keywords: ["golf lessons", "golf instructor", "pga pro", "club fitting", "club repair", "regripping", "custom clubs", "used clubs", "pro shop", "golf course", "driving range"],
+  },
+  {
+    slug: "martial-arts",
+    name: "Martial arts",
+    heading: "Martial Arts Schools",
+    singular: "martial arts school",
+    group: "sports-recreation",
+    schemaType: "SportsActivityLocation",
+    blurb: "karate, taekwondo, jiu-jitsu, kickboxing and self-defense classes for kids and adults",
+    keywords: ["karate", "taekwondo", "tae kwon do", "jiu jitsu", "bjj", "judo", "kickboxing", "mma", "self defense", "dojo"],
   },
 ];
