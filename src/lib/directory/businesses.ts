@@ -38,10 +38,13 @@ import type { Business } from "./types";
  * Broad Street Mill, Coollectables, Flanders Nurseries, Georgia Real Estate,
  * Gigi's Home and Garden, Griffin Dental Concepts, Griffith's Drive-In,
  * Grubbs Law Firm, Margo's, Nicolas Auto Repair, Oakbridge Insurance,
- * Piedmont Brewery Griffin, Posh Pet Spa, Sweet Southern Salvage, The Auction
- * Block, The Corner Cafe, The Plant Emporium, The Tipsy Daisy and Wilde
- * Roofing. Melvin Rooks & Howell is listed under its current name, Rooks,
- * Waltz, Jackson and Esary.
+ * Piedmont Brewery Griffin, Posh Pet Spa, Sweet Southern Salvage, The Corner
+ * Cafe, The Plant Emporium, The Tipsy Daisy and Wilde Roofing. Melvin Rooks &
+ * Howell is listed under its current name, Rooks, Waltz, Jackson and Esary.
+ *
+ * The Auction Block was among those removals and came back on 2026-11-09 as
+ * an editor's recommendation, with its Facebook page standing in for a
+ * website (see its entry).
  */
 
 function griffin(street: string, zip: "30223" | "30224", suite?: string): Business["address"] {
@@ -58,6 +61,48 @@ const LAUNCH = "2026-10-30";
 const VERIFIED = "2026-11-01";
 
 export const BUSINESSES: Business[] = [
+  /* ---------------- Added 2026-11-09 ---------------- */
+  {
+    // Editor's recommendation; the business has no website, so its Facebook
+    // page stands in for one. Sources: https://www.facebook.com/theauctionblock
+    // and /about (intro, address, suite, phone, posted prices); inGriffin's
+    // Griffin + Spalding Antiquing Guide (7,000+ square feet). Hours from
+    // public listings and a vendor's post, not the mall itself; Facebook
+    // shows them only when signed in. "Across from The Sock Shoppe" is from
+    // the Grapevine's own recommendation.
+    slug: "the-auction-block-antique-mall",
+    name: "The Auction Block Antique Mall",
+    category: "antiques-vintage",
+    tier: "free",
+    town: "Griffin",
+    address: griffin("324 E Broad St", "30223", "Suite 115"),
+    phone: "(678) 315-3402",
+    website: "https://www.facebook.com/theauctionblock",
+    tagline: "Griffin's biggest room of real antiques and vintage furniture, plus handmade iron art.",
+    description: [
+      "On the lower level of downtown's Broad Street Mill, The Auction Block is a multi-dealer antique mall with more than 7,000 square feet of booths to wander. The emphasis is on true antiques and older vintage pieces: furniture from china cabinets on down, plus decor for every room of the house. Dealers restock constantly, so next month's visit won't look like this one.",
+      "Several vendors share the floor, and the mall also carries blacksmith-forged and welded iron art you won't find in a chain store. Look for Suite 115, across from The Sock Shoppe, and leave time for the rest of the Broad Street Mill's shops a few steps away. New arrivals and their prices go up regularly on the mall's Facebook page.",
+    ],
+    services: [
+      "Antique furniture",
+      "Vintage furniture and home decor",
+      "Collectibles",
+      "Blacksmith and welded iron art",
+      "Multi-dealer booths",
+    ],
+    hours: {
+      mon: [],
+      tue: [{ opens: "10:00", closes: "18:00" }],
+      wed: [{ opens: "10:00", closes: "18:00" }],
+      thu: [{ opens: "10:00", closes: "18:00" }],
+      fri: [{ opens: "10:00", closes: "18:00" }],
+      sat: [{ opens: "10:00", closes: "18:00" }],
+      sun: [],
+    },
+    tags: ["open-saturday", "downtown"],
+    addedAt: "2026-11-09",
+    verifiedAt: "2026-11-09",
+  },
   /* ---------------- Added 2026-11-01 ---------------- */
   {
     // Sources: https://smallcakesgriffingeorgia.com/ (menu, hours, ordering).
