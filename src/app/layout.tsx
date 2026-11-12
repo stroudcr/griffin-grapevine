@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     ],
     videos: [
       {
-        url: "/og-video.mp4",
+        url: `${SITE_CONFIG.url}/og-video.mp4`,
         secureUrl: `${SITE_CONFIG.url}/og-video.mp4`,
         type: "video/mp4",
         width: 1200,
