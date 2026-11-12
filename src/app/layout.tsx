@@ -50,6 +50,15 @@ export const metadata: Metadata = {
         alt: `${SITE_CONFIG.name} - ${SITE_CONFIG.tagline}, ${SITE_CONFIG.location.state}`,
       },
     ],
+    videos: [
+      {
+        url: "/og-video.mp4",
+        secureUrl: `${SITE_CONFIG.url}/og-video.mp4`,
+        type: "video/mp4",
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
